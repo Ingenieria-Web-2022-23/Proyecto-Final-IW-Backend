@@ -1,0 +1,1917 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "TPVV",
+    "description" : "TPVV Ingeniería Web",
+    "contact" : {
+      "email" : "lac56@alu.ua.es"
+    },
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "https://virtserver.swaggerhub.com/lac56-alu/TPVV/1.0.0",
+    "description" : "SwaggerHub API Auto Mocking"
+  }, {
+    "url" : "http://localhost:2000",
+    "description" : "Desarrollo servidor basado en TPVV IW"
+  }, {
+    "url" : "",
+    "description" : "Servidor"
+  } ],
+  "tags" : [ {
+    "name" : "Seguridad"
+  }, {
+    "name" : "Pagos"
+  }, {
+    "name" : "Devoluciones"
+  }, {
+    "name" : "Tickets"
+  }, {
+    "name" : "Usuario"
+  } ],
+  "paths" : {
+    "/tpvv/registro" : {
+      "put" : {
+        "tags" : [ "Seguridad" ],
+        "summary" : "Se da de alta a un nuevo usuario en nuestro sistema",
+        "description" : "Podremos aregrar nuevos usuario/clientes a nuestro sistema a través de un sencillo formulario de registro.",
+        "operationId" : "registro",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Registro"
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Registro realizado correctamente",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/login" : {
+      "post" : {
+        "tags" : [ "Seguridad" ],
+        "summary" : "Si el login se completa de forma correcta, se le devolverá al usuario su token.",
+        "description" : "Para el inicio de sesión solo necesitaremos nuestro usuario y contraseña. Pero para la realización del resto de trasacciones lo que necesitaremos será un token que va asociado a cada cuenta de usuario y que será único.",
+        "operationId" : "login",
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Login"
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Nos devolverá el Token de ese usuario.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_201"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "El cliente no posee los permisos necesarios para cierto contenido, por lo que el servidor está rechazando otorgar una respuesta apropiada.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/token" : {
+      "get" : {
+        "tags" : [ "Seguridad" ],
+        "summary" : "Se obtiene el token único del usuario",
+        "description" : "Para realizar la aplicación tendremos dos tipos de autorización, una apiKey que nos dará la autorización para hacer las peticiones de la API y un AuthToken único para cada uno de los usuarios de nuestro TPVV.",
+        "operationId" : "getToken",
+        "responses" : {
+          "201" : {
+            "description" : "Nos devolverá el Token de ese usuario.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_201"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "El cliente no posee los permisos necesarios para cierto contenido, por lo que el servidor está rechazando otorgar una respuesta apropiada.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_403"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/realizarPago" : {
+      "post" : {
+        "tags" : [ "Pagos" ],
+        "summary" : "Se hace una nueva transaccion",
+        "description" : "Lo que hacemos es realizar una nueva trasacción vinculada al cliente",
+        "operationId" : "realizarPago",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Pago"
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Detalles sobre la transaccion",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Pagos"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/listaPagos" : {
+      "get" : {
+        "tags" : [ "Pagos" ],
+        "summary" : "Se devuelven todos los pagos realizados por ese usuario",
+        "description" : "Lo que hacemos es mediante el token verificar que usuario es el que esta haciendo la peticion y entonces listar todos los pagos que ha realizado a través de nuestra aplicación.",
+        "operationId" : "listaPagos",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Lista de los pagos del usuario",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/detallesPago" : {
+      "get" : {
+        "tags" : [ "Pagos" ],
+        "summary" : "Obtiene todos los detalles de una transacción en específico",
+        "description" : "Lo que haremos será consultar un pago en concreto. Podremos ver todos los campos que hemos introducido para la transacción así como el estado en el que se encuentra la misma",
+        "operationId" : "getDetallesPago",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idPago",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Detalles sobre la transaccion",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Pagos"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No se encontró el recurso que se pidió",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/realizarDevolucion" : {
+      "post" : {
+        "tags" : [ "Devoluciones" ],
+        "summary" : "Realizar una devolución sobre una de las compras realizadas",
+        "description" : "Realizar una devolución sobre una de las compras realizadas",
+        "operationId" : "realizarDevolucion",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idPago",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Detalles sobre la transaccion",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Devoluciones"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No se encontró el recurso que se pidió",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/listaDevoluciones" : {
+      "get" : {
+        "tags" : [ "Devoluciones" ],
+        "summary" : "Se listan todas las devoluciones del usuario",
+        "description" : "Se obtienen una lista con todas las devoluciones que se han realizado por el usuario que hace la petición",
+        "operationId" : "getListaDevoluciones",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Lista de las devoluciones",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/detallesDevolucion" : {
+      "get" : {
+        "tags" : [ "Devoluciones" ],
+        "summary" : "Obtendremos los detalles de una devolucion en concreto",
+        "description" : "Obtendremos los detalles de una devolucion en concreto",
+        "operationId" : "getDetallesDevolucion",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idPago",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "integer"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Detalles sobre la transaccion",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Devoluciones"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No se encontró el recurso que se pidió",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/crearTicket" : {
+      "post" : {
+        "tags" : [ "Tickets" ],
+        "summary" : "Crea un nuevo ticket",
+        "description" : "Se abrirá un ticket sobre una incidencia relacionada con uno de los pagos realizados",
+        "operationId" : "crearTicket",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Ticket"
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Detalles o datos del ticket",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Ticket"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/chatTicket/enviarMessage" : {
+      "post" : {
+        "tags" : [ "Tickets" ],
+        "summary" : "Enviar un mensaje nuevo al chat del ticket",
+        "description" : "Podremos enviar un nuevo mensaje al chat que tiene vinculado cada ticket, para así mantener una conversación con el administrador encargado de ayudarnos con nuestra incidencia.",
+        "operationId" : "enviarMensaje",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idTicket",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Mensaje"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Mensaje enviado correctamente"
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No se encontró el recurso que se pidió",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/listaTickets" : {
+      "get" : {
+        "tags" : [ "Tickets" ],
+        "summary" : "Obtiene una lista con todos los tickets que se han creado.",
+        "description" : "Se devolverá una lista con todos los tickets",
+        "operationId" : "getListaTickets",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "estadoFiltro",
+          "in" : "query",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string",
+            "enum" : [ "ABIERTO", "CERRADO", "ESPERA", "CANCELADO" ]
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Lista con todos los tickets",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_2"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/detallesTicket" : {
+      "get" : {
+        "tags" : [ "Tickets" ],
+        "summary" : "Consultar los detalles de un ticket en concreto",
+        "description" : "Podremos consultar los detalles de un ticket, es decir tanto los datos que hemos proporcionado sobre la incidencia como al respuesta proporcionada por el administrador a cargo de ella.",
+        "operationId" : "getDetallesTicket",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idTicket",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Detalles o datos del ticket",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Ticket"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No se encontró el recurso que se pidió",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/chatTicket" : {
+      "get" : {
+        "tags" : [ "Tickets" ],
+        "summary" : "Devolver los mensajes del chat del ticket",
+        "description" : "Podremos consultar el intercambio de mensajes que hay vinculados a un ticket, es decir las respuestas tanto del admin como del usuario vinculados a un ticket",
+        "operationId" : "getChatTicket",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idTicket",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Mensajes dentro de un ticket",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_3"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No se encontró el recurso que se pidió",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/borrarTicket" : {
+      "delete" : {
+        "tags" : [ "Tickets" ],
+        "summary" : "Podremos borrar un ticket en especifico",
+        "description" : "Podremos borrar un ticket de nuestro sistema para siempre",
+        "operationId" : "borrarTicket",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idTicket",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Ticket borrado con exito"
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No se encontró el recurso que se pidió",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/crearUsuario" : {
+      "post" : {
+        "tags" : [ "Usuario" ],
+        "summary" : "Crea un nuevo usuario",
+        "description" : "Podremos crear nuevos usuarios para nuestro sistema, será la única forma de introducir un nuevo cliente dentro del mismo.",
+        "operationId" : "crearUsuario",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Usuario"
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Usuario creado correctamente"
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/modificarUsuario" : {
+      "put" : {
+        "tags" : [ "Usuario" ],
+        "summary" : "Podremos modificar un usuario",
+        "description" : "Podremos modificar todos los campos de un usuario, es decir cambiar cada uno de los campos que ha introducido este para registrarse en nuestro sistema.",
+        "operationId" : "modificarUsuario",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idUsuario",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/UsuarioModificar"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Detalles del usuario",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No se encontró el recurso que se pidió",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/borrarUsuario" : {
+      "delete" : {
+        "tags" : [ "Usuario" ],
+        "summary" : "Podremos borrar un usuario en especifico",
+        "description" : "Podremos borrar un usuario de nuestro sistema para siempre",
+        "operationId" : "borrarUsuario",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idUsuario",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Usuario borrado con exito"
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No se encontró el recurso que se pidió",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/detallesUsuario" : {
+      "get" : {
+        "tags" : [ "Usuario" ],
+        "summary" : "Obtener los detalles de un usuario en especifico",
+        "description" : "Podremos consultar todos los detalles de un usuario, es decir visualizar cada uno de los campos que ha introducido este para registrarse en nuestro sistema.",
+        "operationId" : "getDetallesUsuario",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idUsuario",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Detalles del usuario",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Usuario"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "No se encontró el recurso que se pidió",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_404"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/listaUsuarios" : {
+      "get" : {
+        "tags" : [ "Usuario" ],
+        "summary" : "Devuelve una lista con todos los usuarios",
+        "description" : "Devuelve una lista con todos los usuarios que tenemos registrados dentro de nuestro sistema",
+        "operationId" : "getListaUsuarios",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Lista con todos los usuarios",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200_4"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tpvv/regenerarTokenUsuario" : {
+      "post" : {
+        "tags" : [ "Usuario" ],
+        "summary" : "Regenerar el token del usuario",
+        "description" : "Podremos volver a generar el token que va asociado al usuario, si por algún motivo este quiere realiar esta operación ya sea por seguridad o porque lo haya perdido.",
+        "operationId" : "regenerarToken",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Nos devolverá el Token de ese usuario.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_201"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Pagos" : {
+        "required" : [ "referencia", "tarjeta", "total" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "example" : 1
+          },
+          "devolucionId" : {
+            "type" : "array",
+            "description" : "Id de la devolución, si hubiera (en caso contrario -> null)",
+            "example" : 22,
+            "items" : {
+              "type" : "integer"
+            }
+          },
+          "total" : {
+            "type" : "number",
+            "description" : "Total de la compra",
+            "example" : 120.9
+          },
+          "concepto" : {
+            "type" : "string",
+            "description" : "Se podrá añadir opcionalmente a la hora de realizar el pago un concepto sobre la compra realizada",
+            "example" : "Compra memoria RAM"
+          },
+          "referencia" : {
+            "type" : "string",
+            "description" : "Es la referencia que vincula el pago con el recibo creado por el usuario que realiza la compra",
+            "example" : "515adfas54"
+          },
+          "fecha" : {
+            "type" : "string",
+            "description" : "Fecha del momento en el que se realiza la compra",
+            "format" : "DD-MM-YYYY hh:mm:ss",
+            "example" : "09-12-2022 09:55:23"
+          },
+          "estado" : {
+            "type" : "string",
+            "description" : "Estado de como se encuentra el pago",
+            "example" : "DENEGADO",
+            "enum" : [ "EN_ESPERA", "ACEPTADO", "DENEGADO, DEVOLUCIÓN" ]
+          },
+          "detallesEstado" : {
+            "type" : "string",
+            "description" : "Motivo del error del pago",
+            "example" : "TARJETA DENEGADA"
+          },
+          "tarjeta" : {
+            "$ref" : "#/components/schemas/Tarjeta"
+          }
+        },
+        "example" : {
+          "detallesEstado" : "TARJETA DENEGADA",
+          "fecha" : "09-12-2022 09:55:23",
+          "total" : 120.9,
+          "estado" : "DENEGADO",
+          "concepto" : "Compra memoria RAM",
+          "id" : 1,
+          "devolucionId" : 22,
+          "tarjeta" : {
+            "caducidad" : "09/2023",
+            "numero" : "984516545251",
+            "ccv" : 123,
+            "titularTarjeta" : "Luis Alfonso"
+          },
+          "referencia" : "515adfas54"
+        }
+      },
+      "Tarjeta" : {
+        "type" : "object",
+        "properties" : {
+          "titularTarjeta" : {
+            "type" : "string",
+            "example" : "Luis Alfonso"
+          },
+          "numero" : {
+            "type" : "string",
+            "description" : "Número de la tarjeta de crédito",
+            "example" : "984516545251"
+          },
+          "ccv" : {
+            "type" : "number",
+            "description" : "Código de seguridad",
+            "example" : 123
+          },
+          "caducidad" : {
+            "required" : [ "caducidad", "ccv", "numero", "titularTarjeta" ],
+            "type" : "string",
+            "description" : "Fecha de caducidad de la tarjeta",
+            "format" : "MM/YYYY",
+            "example" : "09/2023"
+          }
+        },
+        "example" : {
+          "caducidad" : "09/2023",
+          "numero" : "984516545251",
+          "ccv" : 123,
+          "titularTarjeta" : "Luis Alfonso"
+        }
+      },
+      "Ticket" : {
+        "required" : [ "asunto", "descripcion", "referenciaPago" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "example" : 1231
+          },
+          "usuarioEncoder" : {
+            "type" : "integer",
+            "description" : "ID del usuario que abrió el ticket",
+            "example" : 475415
+          },
+          "administradorDecoder" : {
+            "type" : "integer",
+            "description" : "ID Administrador que contesta el ticket",
+            "example" : 3
+          },
+          "referenciaPago" : {
+            "type" : "integer",
+            "description" : "ID de la transacción a la que va vinculada el ticket",
+            "example" : 215961312
+          },
+          "asunto" : {
+            "type" : "string",
+            "description" : "Asunto sobre el que trata la incidencia",
+            "example" : "Problema con la transacción"
+          },
+          "descripcion" : {
+            "type" : "string",
+            "description" : "Descripción y explicación de la incidencia por la que se ha abierto el ticket",
+            "example" : "El usuario realizó el pago pero ha habido algún tipo de error con el banco."
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "Estado del ticket",
+            "example" : "ESPERA",
+            "enum" : [ "ABIERTO", "CERRADO", "ESPERA", "CANCELADO" ]
+          }
+        },
+        "example" : {
+          "descripcion" : "El usuario realizó el pago pero ha habido algún tipo de error con el banco.",
+          "administradorDecoder" : 3,
+          "referenciaPago" : 215961312,
+          "asunto" : "Problema con la transacción",
+          "id" : 1231,
+          "usuarioEncoder" : 475415,
+          "status" : "ESPERA"
+        }
+      },
+      "Mensaje" : {
+        "required" : [ "contenido", "idUsuario" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "example" : 51551
+          },
+          "idUsuario" : {
+            "type" : "integer",
+            "description" : "Usuario que envió el mensaje",
+            "example" : 156
+          },
+          "fecha" : {
+            "type" : "string",
+            "description" : "Fecha creación",
+            "example" : "2022-12-12 08:16:22"
+          },
+          "contenido" : {
+            "type" : "string",
+            "description" : "Contenido del mensaje",
+            "example" : "Sigue sin poder confirmar el pago desde el banco"
+          }
+        },
+        "example" : {
+          "fecha" : "2022-12-12 08:16:22",
+          "contenido" : "Sigue sin poder confirmar el pago desde el banco",
+          "idUsuario" : 156,
+          "id" : 51551
+        }
+      },
+      "Usuario" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "example" : 1
+          },
+          "nombre" : {
+            "type" : "string",
+            "example" : "Luis Alfonso"
+          },
+          "email" : {
+            "type" : "string",
+            "example" : "luis@gmail.com"
+          },
+          "password" : {
+            "type" : "string",
+            "format" : "password",
+            "example" : "aijsfbhausfbas"
+          },
+          "token" : {
+            "type" : "string",
+            "example" : "i989nasiudfbas54asd5as4da5s1d"
+          },
+          "nombreEmpresa" : {
+            "type" : "string",
+            "example" : "A reason"
+          },
+          "tipoUsuario" : {
+            "type" : "string",
+            "example" : "normal"
+          }
+        },
+        "example" : {
+          "password" : "aijsfbhausfbas",
+          "tipoUsuario" : "normal",
+          "id" : 1,
+          "nombre" : "Luis Alfonso",
+          "email" : "luis@gmail.com",
+          "nombreEmpresa" : "A reason",
+          "token" : "i989nasiudfbas54asd5as4da5s1d"
+        }
+      },
+      "UsuarioModificar" : {
+        "type" : "object",
+        "properties" : {
+          "nombre" : {
+            "type" : "string",
+            "example" : "Luis Alfonso"
+          },
+          "email" : {
+            "type" : "string",
+            "example" : "luis@gmail.com"
+          },
+          "password" : {
+            "type" : "string",
+            "format" : "password",
+            "example" : "aijsfbhausfbas"
+          },
+          "nombreEmpresa" : {
+            "type" : "string",
+            "example" : "A reason"
+          }
+        }
+      },
+      "Devoluciones" : {
+        "required" : [ "referencia", "tarjeta", "total" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "example" : 1
+          },
+          "devolucionId" : {
+            "type" : "array",
+            "description" : "Id de la devolución, si hubiera (en caso contrario -> null)",
+            "example" : 22,
+            "items" : {
+              "type" : "integer"
+            }
+          },
+          "total" : {
+            "type" : "number",
+            "description" : "Total de la compra",
+            "example" : 120.9
+          },
+          "concepto" : {
+            "type" : "string",
+            "description" : "Se podrá añadir opcionalmente a la hora de realizar el pago un concepto sobre la compra realizada",
+            "example" : "Compra memoria RAM"
+          },
+          "referencia" : {
+            "type" : "string",
+            "description" : "Es la referencia que vincula el pago con el recibo creado por el usuario que realiza la compra",
+            "example" : "515adfas54"
+          },
+          "fecha" : {
+            "type" : "string",
+            "description" : "Fecha del momento en el que se realiza la compra",
+            "format" : "DD-MM-YYYY hh:mm:ss",
+            "example" : "09-12-2022 09:55:23"
+          },
+          "estado" : {
+            "type" : "string",
+            "description" : "Estado de como se encuentra el pago",
+            "example" : "DEVOLUCIÓN",
+            "enum" : [ "EN_ESPERA", "ACEPTADO", "DENEGADO, DEVOLUCIÓN" ]
+          },
+          "detallesEstado" : {
+            "type" : "string",
+            "description" : "Motivo del error del pago",
+            "example" : "TARJETA DENEGADA"
+          },
+          "tarjeta" : {
+            "$ref" : "#/components/schemas/Tarjeta"
+          }
+        },
+        "example" : {
+          "detallesEstado" : "TARJETA DENEGADA",
+          "fecha" : "09-12-2022 09:55:23",
+          "total" : 120.9,
+          "estado" : "DEVOLUCIÓN",
+          "concepto" : "Compra memoria RAM",
+          "id" : 1,
+          "devolucionId" : 22,
+          "tarjeta" : {
+            "caducidad" : "09/2023",
+            "numero" : "984516545251",
+            "ccv" : 123,
+            "titularTarjeta" : "Luis Alfonso"
+          },
+          "referencia" : "515adfas54"
+        }
+      },
+      "inline_response_400" : {
+        "type" : "object",
+        "properties" : {
+          "typeError" : {
+            "type" : "string",
+            "example" : "ERROR_PARAMETERS"
+          },
+          "messageError" : {
+            "type" : "string",
+            "example" : "Los parámetros introducidos son erroneos."
+          }
+        }
+      },
+      "inline_response_201" : {
+        "type" : "object",
+        "properties" : {
+          "Token" : {
+            "type" : "string",
+            "example" : "jbHBSFBUIAKONaiaoizfcja0f09kasndjan"
+          }
+        },
+        "example" : {
+          "Token" : "jbHBSFBUIAKONaiaoizfcja0f09kasndjan"
+        }
+      },
+      "inline_response_403" : {
+        "type" : "object",
+        "properties" : {
+          "typeError" : {
+            "type" : "string",
+            "example" : "ERROR_CREDENTIALS"
+          },
+          "messageError" : {
+            "type" : "string",
+            "example" : "Ha habido algún error en las credenciales introducidas"
+          }
+        }
+      },
+      "inline_response_401" : {
+        "type" : "object",
+        "properties" : {
+          "errorMessage" : {
+            "type" : "string",
+            "example" : "ERROR_TOKEN"
+          }
+        }
+      },
+      "inline_response_200" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Pagos"
+            }
+          }
+        },
+        "example" : {
+          "data" : [ {
+            "detallesEstado" : "TARJETA DENEGADA",
+            "fecha" : "09-12-2022 09:55:23",
+            "total" : 120.9,
+            "estado" : "DENEGADO",
+            "concepto" : "Compra memoria RAM",
+            "id" : 1,
+            "devolucionId" : 22,
+            "tarjeta" : {
+              "caducidad" : "09/2023",
+              "numero" : "984516545251",
+              "ccv" : 123,
+              "titularTarjeta" : "Luis Alfonso"
+            },
+            "referencia" : "515adfas54"
+          }, {
+            "detallesEstado" : "TARJETA DENEGADA",
+            "fecha" : "09-12-2022 09:55:23",
+            "total" : 120.9,
+            "estado" : "DENEGADO",
+            "concepto" : "Compra memoria RAM",
+            "id" : 1,
+            "devolucionId" : 22,
+            "tarjeta" : {
+              "caducidad" : "09/2023",
+              "numero" : "984516545251",
+              "ccv" : 123,
+              "titularTarjeta" : "Luis Alfonso"
+            },
+            "referencia" : "515adfas54"
+          } ]
+        }
+      },
+      "inline_response_404" : {
+        "type" : "object",
+        "properties" : {
+          "errorMessage" : {
+            "type" : "string",
+            "example" : "ERROR_RECURSO_NO_ENCONTRADO"
+          }
+        }
+      },
+      "inline_response_200_1" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Devoluciones"
+            }
+          }
+        },
+        "example" : {
+          "data" : [ {
+            "detallesEstado" : "TARJETA DENEGADA",
+            "fecha" : "09-12-2022 09:55:23",
+            "total" : 120.9,
+            "estado" : "DEVOLUCIÓN",
+            "concepto" : "Compra memoria RAM",
+            "id" : 1,
+            "devolucionId" : 22,
+            "tarjeta" : {
+              "caducidad" : "09/2023",
+              "numero" : "984516545251",
+              "ccv" : 123,
+              "titularTarjeta" : "Luis Alfonso"
+            },
+            "referencia" : "515adfas54"
+          }, {
+            "detallesEstado" : "TARJETA DENEGADA",
+            "fecha" : "09-12-2022 09:55:23",
+            "total" : 120.9,
+            "estado" : "DEVOLUCIÓN",
+            "concepto" : "Compra memoria RAM",
+            "id" : 1,
+            "devolucionId" : 22,
+            "tarjeta" : {
+              "caducidad" : "09/2023",
+              "numero" : "984516545251",
+              "ccv" : 123,
+              "titularTarjeta" : "Luis Alfonso"
+            },
+            "referencia" : "515adfas54"
+          } ]
+        }
+      },
+      "inline_response_200_2" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Ticket"
+            }
+          }
+        },
+        "example" : {
+          "data" : [ {
+            "descripcion" : "El usuario realizó el pago pero ha habido algún tipo de error con el banco.",
+            "administradorDecoder" : 3,
+            "referenciaPago" : 215961312,
+            "asunto" : "Problema con la transacción",
+            "id" : 1231,
+            "usuarioEncoder" : 475415,
+            "status" : "ESPERA"
+          }, {
+            "descripcion" : "El usuario realizó el pago pero ha habido algún tipo de error con el banco.",
+            "administradorDecoder" : 3,
+            "referenciaPago" : 215961312,
+            "asunto" : "Problema con la transacción",
+            "id" : 1231,
+            "usuarioEncoder" : 475415,
+            "status" : "ESPERA"
+          } ]
+        }
+      },
+      "inline_response_200_3" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Mensaje"
+            }
+          }
+        },
+        "example" : {
+          "data" : [ {
+            "fecha" : "2022-12-12 08:16:22",
+            "contenido" : "Sigue sin poder confirmar el pago desde el banco",
+            "idUsuario" : 156,
+            "id" : 51551
+          }, {
+            "fecha" : "2022-12-12 08:16:22",
+            "contenido" : "Sigue sin poder confirmar el pago desde el banco",
+            "idUsuario" : 156,
+            "id" : 51551
+          } ]
+        }
+      },
+      "inline_response_200_4" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Usuario"
+            }
+          }
+        },
+        "example" : {
+          "data" : [ {
+            "password" : "aijsfbhausfbas",
+            "tipoUsuario" : "normal",
+            "id" : 1,
+            "nombre" : "Luis Alfonso",
+            "email" : "luis@gmail.com",
+            "nombreEmpresa" : "A reason",
+            "token" : "i989nasiudfbas54asd5as4da5s1d"
+          }, {
+            "password" : "aijsfbhausfbas",
+            "tipoUsuario" : "normal",
+            "id" : 1,
+            "nombre" : "Luis Alfonso",
+            "email" : "luis@gmail.com",
+            "nombreEmpresa" : "A reason",
+            "token" : "i989nasiudfbas54asd5as4da5s1d"
+          } ]
+        }
+      }
+    },
+    "responses" : {
+      "RegistroCorrecto" : {
+        "description" : "Registro realizado correctamente",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Usuario"
+            }
+          }
+        }
+      },
+      "NoEncontroRecurso" : {
+        "description" : "No se encontró el recurso que se pidió",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_response_404"
+            }
+          }
+        }
+      },
+      "ParametrosErroneos" : {
+        "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_response_400"
+            }
+          }
+        }
+      },
+      "ErrorAutentificacion" : {
+        "description" : "Sin autorización para realizar esta operación",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_response_401"
+            }
+          }
+        }
+      },
+      "RespuestaPago" : {
+        "description" : "Detalles sobre la transaccion",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Pagos"
+            }
+          }
+        }
+      },
+      "RespuestaDevolucion" : {
+        "description" : "Detalles sobre la transaccion",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Devoluciones"
+            }
+          }
+        }
+      },
+      "Ticket" : {
+        "description" : "Detalles o datos del ticket",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Ticket"
+            }
+          }
+        }
+      },
+      "MensajesChat" : {
+        "description" : "Mensajes dentro de un ticket",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_response_200_3"
+            }
+          }
+        }
+      },
+      "RespuestaUsuario" : {
+        "description" : "Detalles del usuario",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Usuario"
+            }
+          }
+        }
+      },
+      "Token" : {
+        "description" : "Nos devolverá el Token de ese usuario.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_response_201"
+            }
+          }
+        }
+      },
+      "ErrorCredentials" : {
+        "description" : "El cliente no posee los permisos necesarios para cierto contenido, por lo que el servidor está rechazando otorgar una respuesta apropiada.",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_response_403"
+            }
+          }
+        }
+      },
+      "ListaPagos" : {
+        "description" : "Lista de los pagos del usuario",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_response_200"
+            }
+          }
+        }
+      },
+      "ListaTickets" : {
+        "description" : "Lista con todos los tickets",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_response_200_2"
+            }
+          }
+        }
+      },
+      "ListaUsuarios" : {
+        "description" : "Lista con todos los usuarios",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_response_200_4"
+            }
+          }
+        }
+      },
+      "ListaDevoluciones" : {
+        "description" : "Lista de las devoluciones",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/inline_response_200_1"
+            }
+          }
+        }
+      }
+    },
+    "requestBodies" : {
+      "Login" : {
+        "description" : "Credenciales para el inicio de sesión",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "required" : [ "password", "username" ],
+              "type" : "object",
+              "properties" : {
+                "userName" : {
+                  "type" : "string",
+                  "example" : "antonio99"
+                },
+                "password" : {
+                  "type" : "string",
+                  "example" : "pass123"
+                }
+              }
+            }
+          }
+        },
+        "required" : true
+      },
+      "Registro" : {
+        "description" : "Credenciales para el registro de nuevos usuarios/clientes",
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "required" : [ "email", "password", "username" ],
+              "type" : "object",
+              "properties" : {
+                "email" : {
+                  "type" : "string",
+                  "example" : "antonio@gmail.com"
+                },
+                "userName" : {
+                  "type" : "string",
+                  "example" : "antonio99"
+                },
+                "password" : {
+                  "type" : "string",
+                  "example" : "pass123"
+                }
+              }
+            }
+          }
+        },
+        "required" : true
+      },
+      "Pago" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Pagos"
+            }
+          }
+        },
+        "required" : true
+      },
+      "Ticket" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Ticket"
+            }
+          }
+        },
+        "required" : true
+      },
+      "Usuario" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Usuario"
+            }
+          }
+        },
+        "required" : true
+      },
+      "UsuarioModificar" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/UsuarioModificar"
+            }
+          }
+        },
+        "required" : true
+      },
+      "Mensaje" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Mensaje"
+            }
+          }
+        },
+        "required" : true
+      }
+    }
+  }
+}
