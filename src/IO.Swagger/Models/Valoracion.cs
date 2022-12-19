@@ -21,41 +21,17 @@ using Newtonsoft.Json;
 namespace IO.Swagger.Models
 { 
     /// <summary>
-    /// 
+    /// Nota que pone el usuario
     /// </summary>
     [DataContract]
-    public partial class Tarjeta : IEquatable<Tarjeta>
+    public partial class Valoracion : IEquatable<Valoracion>
     { 
         /// <summary>
-        /// Gets or Sets TitularTarjeta
+        /// Gets or Sets Numero
         /// </summary>
-
-        [DataMember(Name="titularTarjeta")]
-        public string TitularTarjeta { get; set; }
-
-        /// <summary>
-        /// Número de la tarjeta de crédito
-        /// </summary>
-        /// <value>Número de la tarjeta de crédito</value>
 
         [DataMember(Name="numero")]
-        public string Numero { get; set; }
-
-        /// <summary>
-        /// Código de seguridad
-        /// </summary>
-        /// <value>Código de seguridad</value>
-
-        [DataMember(Name="ccv")]
-        public decimal? Ccv { get; set; }
-
-        /// <summary>
-        /// Fecha de caducidad de la tarjeta
-        /// </summary>
-        /// <value>Fecha de caducidad de la tarjeta</value>
-
-        [DataMember(Name="caducidad")]
-        public string Caducidad { get; set; }
+        public int? Numero { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
@@ -64,11 +40,8 @@ namespace IO.Swagger.Models
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append("class Tarjeta {\n");
-            sb.Append("  TitularTarjeta: ").Append(TitularTarjeta).Append("\n");
+            sb.Append("class Valoracion {\n");
             sb.Append("  Numero: ").Append(Numero).Append("\n");
-            sb.Append("  Ccv: ").Append(Ccv).Append("\n");
-            sb.Append("  Caducidad: ").Append(Caducidad).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -91,39 +64,24 @@ namespace IO.Swagger.Models
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((Tarjeta)obj);
+            return obj.GetType() == GetType() && Equals((Valoracion)obj);
         }
 
         /// <summary>
-        /// Returns true if Tarjeta instances are equal
+        /// Returns true if Valoracion instances are equal
         /// </summary>
-        /// <param name="other">Instance of Tarjeta to be compared</param>
+        /// <param name="other">Instance of Valoracion to be compared</param>
         /// <returns>Boolean</returns>
-        public bool Equals(Tarjeta other)
+        public bool Equals(Valoracion other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
             return 
                 (
-                    TitularTarjeta == other.TitularTarjeta ||
-                    TitularTarjeta != null &&
-                    TitularTarjeta.Equals(other.TitularTarjeta)
-                ) && 
-                (
                     Numero == other.Numero ||
                     Numero != null &&
                     Numero.Equals(other.Numero)
-                ) && 
-                (
-                    Ccv == other.Ccv ||
-                    Ccv != null &&
-                    Ccv.Equals(other.Ccv)
-                ) && 
-                (
-                    Caducidad == other.Caducidad ||
-                    Caducidad != null &&
-                    Caducidad.Equals(other.Caducidad)
                 );
         }
 
@@ -137,14 +95,8 @@ namespace IO.Swagger.Models
             {
                 var hashCode = 41;
                 // Suitable nullity checks etc, of course :)
-                    if (TitularTarjeta != null)
-                    hashCode = hashCode * 59 + TitularTarjeta.GetHashCode();
                     if (Numero != null)
                     hashCode = hashCode * 59 + Numero.GetHashCode();
-                    if (Ccv != null)
-                    hashCode = hashCode * 59 + Ccv.GetHashCode();
-                    if (Caducidad != null)
-                    hashCode = hashCode * 59 + Caducidad.GetHashCode();
                 return hashCode;
             }
         }
@@ -152,12 +104,12 @@ namespace IO.Swagger.Models
         #region Operators
         #pragma warning disable 1591
 
-        public static bool operator ==(Tarjeta left, Tarjeta right)
+        public static bool operator ==(Valoracion left, Valoracion right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Tarjeta left, Tarjeta right)
+        public static bool operator !=(Valoracion left, Valoracion right)
         {
             return !Equals(left, right);
         }

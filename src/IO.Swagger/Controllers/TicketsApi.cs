@@ -225,5 +225,41 @@ namespace IO.Swagger.Controllers
                         : default(InlineResponse2002);            //TODO: Change the data returned
             return new ObjectResult(example);
         }
+
+        /// <summary>
+        /// El usuario otorga una valoración al ticket abierto
+        /// </summary>
+        /// <remarks>El usuario que ha abierto el ticket va a tener la posibilidad de asignar una valoración para el ticket que ha abierto anteriormente.</remarks>
+        /// <param name="body"></param>
+        /// <param name="token"></param>
+        /// <param name="idTicket"></param>
+        /// <response code="200">Detalles o datos del ticket</response>
+        /// <response code="400">Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.</response>
+        /// <response code="401">Sin autorización para realizar esta operación</response>
+        [HttpPost]
+        [Route("/lac56-alu/TPVV/1.0.0/tpvv/valorarTicket")]
+        [ValidateModelState]
+        [SwaggerOperation("ValorarTicket")]
+        [SwaggerResponse(statusCode: 200, type: typeof(Ticket), description: "Detalles o datos del ticket")]
+        [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
+        [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
+        public virtual IActionResult ValorarTicket([FromBody]Valoracion body, [FromQuery][Required()]string token, [FromQuery][Required()]decimal? idTicket)
+        { 
+            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+            // return StatusCode(200, default(Ticket));
+
+            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+            // return StatusCode(400, default(InlineResponse400));
+
+            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
+            // return StatusCode(401, default(InlineResponse401));
+            string exampleJson = null;
+            exampleJson = "{\n  \"descripcion\" : \"El usuario realizó el pago pero ha habido algún tipo de error con el banco.\",\n  \"administradorDecoder\" : 3,\n  \"referenciaPago\" : 215961312,\n  \"asunto\" : \"Problema con la transacción\",\n  \"id\" : 1231,\n  \"usuarioEncoder\" : 475415,\n  \"status\" : \"ESPERA\"\n}";
+            
+                        var example = exampleJson != null
+                        ? JsonConvert.DeserializeObject<Ticket>(exampleJson)
+                        : default(Ticket);            //TODO: Change the data returned
+            return new ObjectResult(example);
+        }
     }
 }

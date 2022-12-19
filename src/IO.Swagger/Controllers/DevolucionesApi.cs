@@ -59,7 +59,7 @@ namespace IO.Swagger.Controllers
             //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(404, default(InlineResponse404));
             string exampleJson = null;
-            exampleJson = "{\n  \"detallesEstado\" : \"TARJETA DENEGADA\",\n  \"fecha\" : \"09-12-2022 09:55:23\",\n  \"total\" : 120.9,\n  \"estado\" : \"DEVOLUCIÓN\",\n  \"concepto\" : \"Compra memoria RAM\",\n  \"id\" : 1,\n  \"devolucionId\" : 22,\n  \"tarjeta\" : {\n    \"caducidad\" : \"09/2023\",\n    \"numero\" : \"984516545251\",\n    \"ccv\" : 123,\n    \"titularTarjeta\" : \"Luis Alfonso\"\n  },\n  \"referencia\" : \"515adfas54\"\n}";
+            exampleJson = "{\n  \"detallesEstado\" : \"TARJETA DENEGADA\",\n  \"fecha\" : \"09-12-2022 09:55:23\",\n  \"total\" : 120.9,\n  \"estado\" : \"DEVOLUCIÓN\",\n  \"concepto\" : \"Compra memoria RAM\",\n  \"id\" : 1,\n  \"devolucionId\" : 22,\n  \"referencia\" : \"515adfas54\"\n}";
             
                         var example = exampleJson != null
                         ? JsonConvert.DeserializeObject<Devoluciones>(exampleJson)
@@ -88,7 +88,7 @@ namespace IO.Swagger.Controllers
             //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(401, default(InlineResponse401));
             string exampleJson = null;
-            exampleJson = "{\n  \"data\" : [ {\n    \"detallesEstado\" : \"TARJETA DENEGADA\",\n    \"fecha\" : \"09-12-2022 09:55:23\",\n    \"total\" : 120.9,\n    \"estado\" : \"DEVOLUCIÓN\",\n    \"concepto\" : \"Compra memoria RAM\",\n    \"id\" : 1,\n    \"devolucionId\" : 22,\n    \"tarjeta\" : {\n      \"caducidad\" : \"09/2023\",\n      \"numero\" : \"984516545251\",\n      \"ccv\" : 123,\n      \"titularTarjeta\" : \"Luis Alfonso\"\n    },\n    \"referencia\" : \"515adfas54\"\n  }, {\n    \"detallesEstado\" : \"TARJETA DENEGADA\",\n    \"fecha\" : \"09-12-2022 09:55:23\",\n    \"total\" : 120.9,\n    \"estado\" : \"DEVOLUCIÓN\",\n    \"concepto\" : \"Compra memoria RAM\",\n    \"id\" : 1,\n    \"devolucionId\" : 22,\n    \"tarjeta\" : {\n      \"caducidad\" : \"09/2023\",\n      \"numero\" : \"984516545251\",\n      \"ccv\" : 123,\n      \"titularTarjeta\" : \"Luis Alfonso\"\n    },\n    \"referencia\" : \"515adfas54\"\n  } ]\n}";
+            exampleJson = "{\n  \"data\" : [ {\n    \"detallesEstado\" : \"TARJETA DENEGADA\",\n    \"fecha\" : \"09-12-2022 09:55:23\",\n    \"total\" : 120.9,\n    \"estado\" : \"DEVOLUCIÓN\",\n    \"concepto\" : \"Compra memoria RAM\",\n    \"id\" : 1,\n    \"devolucionId\" : 22,\n    \"referencia\" : \"515adfas54\"\n  }, {\n    \"detallesEstado\" : \"TARJETA DENEGADA\",\n    \"fecha\" : \"09-12-2022 09:55:23\",\n    \"total\" : 120.9,\n    \"estado\" : \"DEVOLUCIÓN\",\n    \"concepto\" : \"Compra memoria RAM\",\n    \"id\" : 1,\n    \"devolucionId\" : 22,\n    \"referencia\" : \"515adfas54\"\n  } ]\n}";
             
                         var example = exampleJson != null
                         ? JsonConvert.DeserializeObject<InlineResponse2001>(exampleJson)
@@ -128,7 +128,7 @@ namespace IO.Swagger.Controllers
             //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(404, default(InlineResponse404));
             string exampleJson = null;
-            exampleJson = "{\n  \"detallesEstado\" : \"TARJETA DENEGADA\",\n  \"fecha\" : \"09-12-2022 09:55:23\",\n  \"total\" : 120.9,\n  \"estado\" : \"DEVOLUCIÓN\",\n  \"concepto\" : \"Compra memoria RAM\",\n  \"id\" : 1,\n  \"devolucionId\" : 22,\n  \"tarjeta\" : {\n    \"caducidad\" : \"09/2023\",\n    \"numero\" : \"984516545251\",\n    \"ccv\" : 123,\n    \"titularTarjeta\" : \"Luis Alfonso\"\n  },\n  \"referencia\" : \"515adfas54\"\n}";
+            exampleJson = "{\n  \"detallesEstado\" : \"TARJETA DENEGADA\",\n  \"fecha\" : \"09-12-2022 09:55:23\",\n  \"total\" : 120.9,\n  \"estado\" : \"DEVOLUCIÓN\",\n  \"concepto\" : \"Compra memoria RAM\",\n  \"id\" : 1,\n  \"devolucionId\" : 22,\n  \"referencia\" : \"515adfas54\"\n}";
             
                         var example = exampleJson != null
                         ? JsonConvert.DeserializeObject<Devoluciones>(exampleJson)

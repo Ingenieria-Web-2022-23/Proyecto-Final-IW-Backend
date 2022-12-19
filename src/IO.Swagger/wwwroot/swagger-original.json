@@ -584,6 +584,68 @@
         }
       }
     },
+    "/tpvv/valorarTicket" : {
+      "post" : {
+        "tags" : [ "Tickets" ],
+        "summary" : "El usuario otorga una valoración al ticket abierto",
+        "description" : "El usuario que ha abierto el ticket va a tener la posibilidad de asignar una valoración para el ticket que ha abierto anteriormente.",
+        "operationId" : "valorarTicket",
+        "parameters" : [ {
+          "name" : "token",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "idTicket",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "type" : "number"
+          }
+        } ],
+        "requestBody" : {
+          "$ref" : "#/components/requestBodies/Valoracion"
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Detalles o datos del ticket",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Ticket"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Sin autorización para realizar esta operación",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tpvv/listaTickets" : {
       "get" : {
         "tags" : [ "Tickets" ],
@@ -1117,7 +1179,7 @@
   "components" : {
     "schemas" : {
       "Pagos" : {
-        "required" : [ "referencia", "tarjeta", "total" ],
+        "required" : [ "referencia", "total" ],
         "type" : "object",
         "properties" : {
           "id" : {
@@ -1163,9 +1225,6 @@
             "type" : "string",
             "description" : "Motivo del error del pago",
             "example" : "TARJETA DENEGADA"
-          },
-          "tarjeta" : {
-            "$ref" : "#/components/schemas/Tarjeta"
           }
         },
         "example" : {
@@ -1176,45 +1235,7 @@
           "concepto" : "Compra memoria RAM",
           "id" : 1,
           "devolucionId" : 22,
-          "tarjeta" : {
-            "caducidad" : "09/2023",
-            "numero" : "984516545251",
-            "ccv" : 123,
-            "titularTarjeta" : "Luis Alfonso"
-          },
           "referencia" : "515adfas54"
-        }
-      },
-      "Tarjeta" : {
-        "type" : "object",
-        "properties" : {
-          "titularTarjeta" : {
-            "type" : "string",
-            "example" : "Luis Alfonso"
-          },
-          "numero" : {
-            "type" : "string",
-            "description" : "Número de la tarjeta de crédito",
-            "example" : "984516545251"
-          },
-          "ccv" : {
-            "type" : "number",
-            "description" : "Código de seguridad",
-            "example" : 123
-          },
-          "caducidad" : {
-            "required" : [ "caducidad", "ccv", "numero", "titularTarjeta" ],
-            "type" : "string",
-            "description" : "Fecha de caducidad de la tarjeta",
-            "format" : "MM/YYYY",
-            "example" : "09/2023"
-          }
-        },
-        "example" : {
-          "caducidad" : "09/2023",
-          "numero" : "984516545251",
-          "ccv" : 123,
-          "titularTarjeta" : "Luis Alfonso"
         }
       },
       "Ticket" : {
@@ -1364,7 +1385,7 @@
         }
       },
       "Devoluciones" : {
-        "required" : [ "referencia", "tarjeta", "total" ],
+        "required" : [ "referencia", "total" ],
         "type" : "object",
         "properties" : {
           "id" : {
@@ -1410,9 +1431,6 @@
             "type" : "string",
             "description" : "Motivo del error del pago",
             "example" : "TARJETA DENEGADA"
-          },
-          "tarjeta" : {
-            "$ref" : "#/components/schemas/Tarjeta"
           }
         },
         "example" : {
@@ -1423,14 +1441,18 @@
           "concepto" : "Compra memoria RAM",
           "id" : 1,
           "devolucionId" : 22,
-          "tarjeta" : {
-            "caducidad" : "09/2023",
-            "numero" : "984516545251",
-            "ccv" : 123,
-            "titularTarjeta" : "Luis Alfonso"
-          },
           "referencia" : "515adfas54"
         }
+      },
+      "Valoracion" : {
+        "type" : "object",
+        "properties" : {
+          "numero" : {
+            "type" : "integer",
+            "example" : 4
+          }
+        },
+        "description" : "Nota que pone el usuario"
       },
       "inline_response_400" : {
         "type" : "object",
@@ -1498,12 +1520,6 @@
             "concepto" : "Compra memoria RAM",
             "id" : 1,
             "devolucionId" : 22,
-            "tarjeta" : {
-              "caducidad" : "09/2023",
-              "numero" : "984516545251",
-              "ccv" : 123,
-              "titularTarjeta" : "Luis Alfonso"
-            },
             "referencia" : "515adfas54"
           }, {
             "detallesEstado" : "TARJETA DENEGADA",
@@ -1513,12 +1529,6 @@
             "concepto" : "Compra memoria RAM",
             "id" : 1,
             "devolucionId" : 22,
-            "tarjeta" : {
-              "caducidad" : "09/2023",
-              "numero" : "984516545251",
-              "ccv" : 123,
-              "titularTarjeta" : "Luis Alfonso"
-            },
             "referencia" : "515adfas54"
           } ]
         }
@@ -1551,12 +1561,6 @@
             "concepto" : "Compra memoria RAM",
             "id" : 1,
             "devolucionId" : 22,
-            "tarjeta" : {
-              "caducidad" : "09/2023",
-              "numero" : "984516545251",
-              "ccv" : 123,
-              "titularTarjeta" : "Luis Alfonso"
-            },
             "referencia" : "515adfas54"
           }, {
             "detallesEstado" : "TARJETA DENEGADA",
@@ -1566,12 +1570,6 @@
             "concepto" : "Compra memoria RAM",
             "id" : 1,
             "devolucionId" : 22,
-            "tarjeta" : {
-              "caducidad" : "09/2023",
-              "numero" : "984516545251",
-              "ccv" : 123,
-              "titularTarjeta" : "Luis Alfonso"
-            },
             "referencia" : "515adfas54"
           } ]
         }
@@ -1907,6 +1905,16 @@
           "application/json" : {
             "schema" : {
               "$ref" : "#/components/schemas/Mensaje"
+            }
+          }
+        },
+        "required" : true
+      },
+      "Valoracion" : {
+        "content" : {
+          "application/json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Valoracion"
             }
           }
         },

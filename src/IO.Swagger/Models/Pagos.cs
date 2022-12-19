@@ -115,14 +115,6 @@ namespace IO.Swagger.Models
         public string DetallesEstado { get; set; }
 
         /// <summary>
-        /// Gets or Sets Tarjeta
-        /// </summary>
-        [Required]
-
-        [DataMember(Name="tarjeta")]
-        public Tarjeta Tarjeta { get; set; }
-
-        /// <summary>
         /// Returns the string presentation of the object
         /// </summary>
         /// <returns>String presentation of the object</returns>
@@ -138,7 +130,6 @@ namespace IO.Swagger.Models
             sb.Append("  Fecha: ").Append(Fecha).Append("\n");
             sb.Append("  Estado: ").Append(Estado).Append("\n");
             sb.Append("  DetallesEstado: ").Append(DetallesEstado).Append("\n");
-            sb.Append("  Tarjeta: ").Append(Tarjeta).Append("\n");
             sb.Append("}\n");
             return sb.ToString();
         }
@@ -214,11 +205,6 @@ namespace IO.Swagger.Models
                     DetallesEstado == other.DetallesEstado ||
                     DetallesEstado != null &&
                     DetallesEstado.Equals(other.DetallesEstado)
-                ) && 
-                (
-                    Tarjeta == other.Tarjeta ||
-                    Tarjeta != null &&
-                    Tarjeta.Equals(other.Tarjeta)
                 );
         }
 
@@ -248,8 +234,6 @@ namespace IO.Swagger.Models
                     hashCode = hashCode * 59 + Estado.GetHashCode();
                     if (DetallesEstado != null)
                     hashCode = hashCode * 59 + DetallesEstado.GetHashCode();
-                    if (Tarjeta != null)
-                    hashCode = hashCode * 59 + Tarjeta.GetHashCode();
                 return hashCode;
             }
         }
