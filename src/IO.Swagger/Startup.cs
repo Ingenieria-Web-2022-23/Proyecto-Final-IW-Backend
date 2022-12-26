@@ -81,7 +81,7 @@ namespace IO.Swagger
                            Url = new Uri("https://github.com/swagger-api/swagger-codegen"),
                            Email = "lac56@alu.ua.es"
                         },
-                        TermsOfService = new Uri("")
+                        TermsOfService = new Uri("https://virtserver.swaggerhub.com/lac56-alu/TPVV/1.0.0")
                     });
                     c.CustomSchemaIds(type => type.FullName);
                     c.IncludeXmlComments($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}{_hostingEnv.ApplicationName}.xml");
