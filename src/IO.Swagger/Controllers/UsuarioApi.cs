@@ -138,7 +138,8 @@ namespace IO.Swagger.Controllers
                 catch (MySqlException e)
                 {
                     InlineResponse400 resp2 = new InlineResponse400();
-                    resp2.TypeError = "Error: Fallo a la hora de insertar los valores en la DB";
+                    resp2.TypeError = "ERROR_PARAMETERS";
+                    resp2.MessageError = "Los parámetros introducidos son erroneos.";
                     conn.Close();
                     Console.WriteLine(e.ToString()); ;
                     return StatusCode(400, resp2);
@@ -147,7 +148,8 @@ namespace IO.Swagger.Controllers
             else
             {
                 InlineResponse400 resp2 = new InlineResponse400();
-                resp2.TypeError = "Error: TOKEN INCORRECTO";
+                resp2.TypeError = "ERROR_PARAMETERS";
+                resp2.MessageError = "Los parámetros introducidos son erroneos.";
                 conn.Close();
                 return StatusCode(400, resp2);
             }
