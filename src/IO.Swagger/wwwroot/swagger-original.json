@@ -6,17 +6,15 @@
     "contact" : {
       "email" : "lac56@alu.ua.es"
     },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
     "version" : "1.0.0"
   },
   "servers" : [ {
     "url" : "https://virtserver.swaggerhub.com/lac56-alu/TPVV/1.0.0",
     "description" : "SwaggerHub API Auto Mocking"
-  }, {
-    "url" : "http://localhost:2000",
-    "description" : "Desarrollo servidor basado en TPVV IW"
-  }, {
-    "url" : "",
-    "description" : "Servidor"
   } ],
   "tags" : [ {
     "name" : "Seguridad"
@@ -1238,6 +1236,24 @@
           "referencia" : "515adfas54"
         }
       },
+      "Registro" : {
+        "required" : [ "email", "password", "username" ],
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "example" : "antonio@gmail.com"
+          },
+          "userName" : {
+            "type" : "string",
+            "example" : "antonio99"
+          },
+          "password" : {
+            "type" : "string",
+            "example" : "pass123"
+          }
+        }
+      },
       "Ticket" : {
         "required" : [ "asunto", "descripcion", "referenciaPago" ],
         "type" : "object",
@@ -1835,26 +1851,10 @@
         "required" : true
       },
       "Registro" : {
-        "description" : "Credenciales para el registro de nuevos usuarios/clientes",
         "content" : {
           "application/json" : {
             "schema" : {
-              "required" : [ "email", "password", "username" ],
-              "type" : "object",
-              "properties" : {
-                "email" : {
-                  "type" : "string",
-                  "example" : "antonio@gmail.com"
-                },
-                "userName" : {
-                  "type" : "string",
-                  "example" : "antonio99"
-                },
-                "password" : {
-                  "type" : "string",
-                  "example" : "pass123"
-                }
-              }
+              "$ref" : "#/components/schemas/Registro"
             }
           }
         },

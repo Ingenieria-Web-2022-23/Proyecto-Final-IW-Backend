@@ -98,7 +98,7 @@ namespace IO.Swagger.Controllers
         /// Se da de alta a un nuevo usuario en nuestro sistema
         /// </summary>
         /// <remarks>Podremos aregrar nuevos usuario/clientes a nuestro sistema a través de un sencillo formulario de registro.</remarks>
-        /// <param name="body">Credenciales para el registro de nuevos usuarios/clientes</param>
+        /// <param name="body"></param>
         /// <response code="201">Registro realizado correctamente</response>
         /// <response code="400">Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.</response>
         [HttpPut]
@@ -107,7 +107,7 @@ namespace IO.Swagger.Controllers
         [SwaggerOperation("Registro")]
         [SwaggerResponse(statusCode: 201, type: typeof(Usuario), description: "Registro realizado correctamente")]
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
-        public virtual IActionResult Registro([FromBody]Object body)
+        public virtual IActionResult Registro([FromBody]Registro body)
         { 
             //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
             // return StatusCode(201, default(Usuario));

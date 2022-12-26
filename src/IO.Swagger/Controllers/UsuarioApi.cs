@@ -18,6 +18,7 @@ using IO.Swagger.Attributes;
 
 using Microsoft.AspNetCore.Authorization;
 using IO.Swagger.Models;
+using MySql.Data.MySqlClient;
 
 namespace IO.Swagger.Controllers
 { 
@@ -26,7 +27,46 @@ namespace IO.Swagger.Controllers
     /// </summary>
     [ApiController]
     public class UsuarioApiController : ControllerBase
-    { 
+    {
+        private MySqlConnection conn;
+        private bool comprobarToken(string token)
+        {
+            MySqlCommand cmd2 = new MySqlCommand();
+            cmd2.Connection = conn;
+            cmd2.CommandText = "SELECT * FROM iw.almacentokens where token = '" + token + "'";
+            cmd2.ExecuteNonQuery();
+            MySqlDataReader readerKey = cmd2.ExecuteReader();
+            bool comprobarKey = false;
+
+            while (readerKey.Read())
+            {
+                if (token == readerKey.GetString(1))
+                {
+                    comprobarKey = true;
+                    break;
+                }
+            }
+
+            return comprobarKey;
+        }
+
+        private string generarToken()
+        {
+            var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var Charsarr = new char[25];
+            var random = new Random();
+
+            for (int i = 0; i < Charsarr.Length; i++)
+            {
+                Charsarr[i] = characters[random.Next(characters.Length)];
+            }
+
+            var resultString = new String(Charsarr);
+            Console.WriteLine(resultString);
+
+            return new String(Charsarr);
+        }
+
         /// <summary>
         /// Podremos borrar un usuario en especifico
         /// </summary>
@@ -70,14 +110,51 @@ namespace IO.Swagger.Controllers
         [SwaggerOperation("CrearUsuario")]
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         public virtual IActionResult CrearUsuario([FromBody]Usuario body, [FromQuery][Required()]string token)
-        { 
-            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(201);
+        {
+            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse201 resp = new InlineResponse201();
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(InlineResponse400));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    string tokenGenerado = generarToken();
+                    cmd2.CommandText = "INSERT INTO iw.usuarios (nombre, email, password, token, nombreEmpresa, tipoUsuario) VALUES ('" +
+                        body.Nombre.ToString() + "', '" + body.Email.ToString() + "', '" + body.Password.ToString()
+                        + "', '" + tokenGenerado + "', '" + body.NombreEmpresa.ToString() + "', 'user')";
+                    cmd2.ExecuteNonQuery();
 
-            throw new NotImplementedException();
+                    resp.Token = tokenGenerado;
+                    conn.Close();
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse400 resp2 = new InlineResponse400();
+                    resp2.TypeError = "ERROR_PARAMETERS";
+                    resp2.MessageError = "Los parámetros introducidos son erroneos.";
+                    conn.Close();
+                    Console.WriteLine(e.ToString()); ;
+                    return StatusCode(400, resp2);
+                }
+            }
+            else
+            {
+                InlineResponse400 resp2 = new InlineResponse400();
+                resp2.TypeError = "ERROR_PARAMETERS";
+                resp2.MessageError = "Los parámetros introducidos son erroneos.";
+                conn.Close();
+                return StatusCode(400, resp2);
+            }
+
+            return StatusCode(201, resp);
         }
 
         /// <summary>
