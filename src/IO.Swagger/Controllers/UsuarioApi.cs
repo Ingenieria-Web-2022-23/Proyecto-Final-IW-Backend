@@ -173,24 +173,57 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(Usuario), description: "Detalles del usuario")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
-        public virtual IActionResult GetDetallesUsuario([FromQuery][Required()]string token, [FromQuery][Required()]decimal? idUsuario)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Usuario));
+        public virtual IActionResult GetDetallesUsuario([FromQuery][Required()] string token, [FromQuery][Required()] decimal? idUsuario)
+        {
+            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                MySqlCommand cmd2 = new MySqlCommand();
+                cmd2.Connection = conn;
+                cmd2.CommandText = "SELECT * FROM iw.usuarios where id = " + idUsuario.ToString() + "";
+                cmd2.ExecuteNonQuery();
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
-            string exampleJson = null;
-            exampleJson = "{\n  \"password\" : \"aijsfbhausfbas\",\n  \"tipoUsuario\" : \"normal\",\n  \"id\" : 1,\n  \"nombre\" : \"Luis Alfonso\",\n  \"email\" : \"luis@gmail.com\",\n  \"nombreEmpresa\" : \"A reason\",\n  \"token\" : \"i989nasiudfbas54asd5as4da5s1d\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Usuario>(exampleJson)
-                        : default(Usuario);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                Usuario usuarioItem = new Usuario();
+                MySqlDataReader reader = cmd2.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    usuarioItem.Id = Convert.ToInt32(reader.GetString(0));
+                    usuarioItem.Nombre = reader.GetString(1);
+                    usuarioItem.Email = reader.GetString(2);
+                    usuarioItem.Password = reader.GetString(3);
+                    usuarioItem.Token = reader.GetString(4);
+                    usuarioItem.NombreEmpresa = reader.GetString(5);
+                    usuarioItem.TipoUsuario = reader.GetString(6);
+
+                    conn.Close();
+                    return StatusCode(200, usuarioItem);
+                }
+
+                InlineResponse404 resp3 = new InlineResponse404();
+                resp3.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                conn.Close();
+                return StatusCode(404, resp3);
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
+
+            return StatusCode(200, resp);
         }
+
 
         /// <summary>
         /// Devuelve una lista con todos los usuarios
