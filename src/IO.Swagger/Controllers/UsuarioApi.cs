@@ -241,22 +241,60 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult GetListaUsuarios([FromQuery][Required()]string token)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(InlineResponse2004));
+        {
+            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(InlineResponse400));
+            if (comprobarToken(token))
+            {
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                MySqlCommand cmd2 = new MySqlCommand();
+                cmd2.Connection = conn;
+                cmd2.CommandText = "SELECT * FROM iw.usuarios";
+                cmd2.ExecuteNonQuery();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
-            string exampleJson = null;
-            exampleJson = "{\n  \"data\" : [ {\n    \"password\" : \"aijsfbhausfbas\",\n    \"tipoUsuario\" : \"normal\",\n    \"id\" : 1,\n    \"nombre\" : \"Luis Alfonso\",\n    \"email\" : \"luis@gmail.com\",\n    \"nombreEmpresa\" : \"A reason\",\n    \"token\" : \"i989nasiudfbas54asd5as4da5s1d\"\n  }, {\n    \"password\" : \"aijsfbhausfbas\",\n    \"tipoUsuario\" : \"normal\",\n    \"id\" : 1,\n    \"nombre\" : \"Luis Alfonso\",\n    \"email\" : \"luis@gmail.com\",\n    \"nombreEmpresa\" : \"A reason\",\n    \"token\" : \"i989nasiudfbas54asd5as4da5s1d\"\n  } ]\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<InlineResponse2004>(exampleJson)
-                        : default(InlineResponse2004);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                Usuario usuarioItem = new Usuario();
+                MySqlDataReader reader = cmd2.ExecuteReader();
+                List<Usuario> listaUsuarios = new List<Usuario>();
+
+                while (reader.Read())
+                {
+                    usuarioItem = new Usuario();
+                    usuarioItem.Id = Convert.ToInt32(reader.GetString(0));
+                    usuarioItem.Nombre = reader.GetString(1);
+                    usuarioItem.Email = reader.GetString(2);
+                    usuarioItem.Password = reader.GetString(3);
+                    usuarioItem.Token = reader.GetString(4);
+                    usuarioItem.NombreEmpresa = reader.GetString(5);
+                    usuarioItem.TipoUsuario = reader.GetString(6);
+
+                    listaUsuarios.Add(usuarioItem);
+                }
+
+                if (listaUsuarios.Count > 0)
+                {
+                    conn.Close();
+                    return StatusCode(200, listaUsuarios);
+                }
+
+                conn.Close();
+                InlineResponse404 resp3 = new InlineResponse404();
+                resp3.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                conn.Close();
+                return StatusCode(404, resp3);
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
         }
 
         /// <summary>
