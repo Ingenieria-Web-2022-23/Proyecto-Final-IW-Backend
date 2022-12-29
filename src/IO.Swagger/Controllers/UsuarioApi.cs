@@ -403,19 +403,53 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 201, type: typeof(InlineResponse201), description: "Nos devolverá el Token de ese usuario.")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult RegenerarToken([FromQuery][Required()]string token)
-        { 
-            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(201, default(InlineResponse201));
+        {
+            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse201 resp = new InlineResponse201();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
-            string exampleJson = null;
-            exampleJson = "{\n  \"Token\" : \"jbHBSFBUIAKONaiaoizfcja0f09kasndjan\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<InlineResponse201>(exampleJson)
-                        : default(InlineResponse201);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd3 = new MySqlCommand();
+                    cmd3.Connection = conn;
+                    string tokenGenerado = generarToken();
+                    cmd3.CommandText = "UPDATE iw.usuarios SET token='" + tokenGenerado + "' where token = '" + token + "'";
+                    cmd3.ExecuteNonQuery();
+                    conn.Close();
+
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd4 = new MySqlCommand();
+                    cmd4.Connection = conn;
+                    cmd4.CommandText = "UPDATE iw.almacentokens SET token='" + tokenGenerado + "' where token = '" + token + "'";
+                    cmd4.ExecuteNonQuery();
+                    conn.Close();
+
+                    resp.Token = tokenGenerado;
+                    return StatusCode(201, resp);
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse401 resp3 = new InlineResponse401();
+                    resp3.ErrorMessage = "ERROR_TOKEN";
+                    conn.Close();
+                    return StatusCode(401, resp3);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
         }
     }
 }
