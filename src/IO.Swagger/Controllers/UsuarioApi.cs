@@ -131,9 +131,18 @@ namespace IO.Swagger.Controllers
                         body.Nombre.ToString() + "', '" + body.Email.ToString() + "', '" + body.Password.ToString()
                         + "', '" + tokenGenerado + "', '" + body.NombreEmpresa.ToString() + "', 'user')";
                     cmd2.ExecuteNonQuery();
+                    conn.Close();
+
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd3 = new MySqlCommand();
+                    cmd3.Connection = conn;
+                    cmd3.CommandText = "INSERT INTO iw.almacentokens (token, fk_usuario_token) VALUES ('" + tokenGenerado + "', '" + body.Email.ToString() + "')";
+                    cmd3.ExecuteNonQuery();
 
                     resp.Token = tokenGenerado;
                     conn.Close();
+
                 }
                 catch (MySqlException e)
                 {
@@ -362,7 +371,6 @@ namespace IO.Swagger.Controllers
                     resp3.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
                     conn.Close();
                     return StatusCode(404, resp3);
-
                 }
                 catch (MySqlException e)
                 {
