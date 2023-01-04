@@ -83,17 +83,86 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult BorrarUsuario([FromQuery][Required()]string token, [FromQuery][Required()]decimal? idUsuario)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        {
+            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    cmd2.CommandText = "SELECT * FROM iw.usuarios where id = " + idUsuario.ToString();
+                    cmd2.ExecuteNonQuery();
+                    cmd2.Dispose();
+                    MySqlDataReader readerUsuario = cmd2.ExecuteReader();
+                    bool comprobarUsuario = false;
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
+                    while (readerUsuario.Read())
+                    {
 
-            throw new NotImplementedException();
+                        if (idUsuario == Convert.ToInt32(readerUsuario.GetString(0)))
+                        {
+                            comprobarUsuario = true;
+                            break;
+                        }
+                    }
+
+                    if (comprobarUsuario)
+                    {
+                        try
+                        {
+                            conn = new MySqlConnection(stringConexion);
+                            conn.Open();
+                            MySqlCommand cmd3 = new MySqlCommand();
+                            cmd3.Connection = conn;
+                            cmd3.CommandText = "DELETE FROM iw.usuarios where id = " + idUsuario.ToString();
+                            cmd3.ExecuteNonQuery();
+                            cmd3.Dispose();
+
+                            conn.Close();
+                            return StatusCode(200);
+                            
+                        }
+                        catch (MySqlException e)
+                        {
+                            InlineResponse404 resp2 = new InlineResponse404();
+                            resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                            conn.Close();
+                            return StatusCode(404, resp2);
+                        }
+                    }
+                    else
+                    {
+                        InlineResponse404 resp2 = new InlineResponse404();
+                        resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                        conn.Close();
+                        return StatusCode(404, resp2);
+                    }
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse404 resp2 = new InlineResponse404();
+                    resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                    conn.Close();
+                    return StatusCode(404, resp2);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+
+            }
         }
 
         /// <summary>
@@ -131,9 +200,18 @@ namespace IO.Swagger.Controllers
                         body.Nombre.ToString() + "', '" + body.Email.ToString() + "', '" + body.Password.ToString()
                         + "', '" + tokenGenerado + "', '" + body.NombreEmpresa.ToString() + "', 'user')";
                     cmd2.ExecuteNonQuery();
+                    conn.Close();
+
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd3 = new MySqlCommand();
+                    cmd3.Connection = conn;
+                    cmd3.CommandText = "INSERT INTO iw.almacentokens (token, fk_usuario_token) VALUES ('" + tokenGenerado + "', '" + body.Email.ToString() + "')";
+                    cmd3.ExecuteNonQuery();
 
                     resp.Token = tokenGenerado;
                     conn.Close();
+
                 }
                 catch (MySqlException e)
                 {
@@ -141,7 +219,7 @@ namespace IO.Swagger.Controllers
                     resp2.TypeError = "ERROR_PARAMETERS";
                     resp2.MessageError = "Los parámetros introducidos son erroneos.";
                     conn.Close();
-                    Console.WriteLine(e.ToString()); ;
+                    Console.WriteLine(e.ToString());
                     return StatusCode(400, resp2);
                 }
             }
@@ -173,24 +251,57 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(Usuario), description: "Detalles del usuario")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
-        public virtual IActionResult GetDetallesUsuario([FromQuery][Required()]string token, [FromQuery][Required()]decimal? idUsuario)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Usuario));
+        public virtual IActionResult GetDetallesUsuario([FromQuery][Required()] string token, [FromQuery][Required()] decimal? idUsuario)
+        {
+            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                MySqlCommand cmd2 = new MySqlCommand();
+                cmd2.Connection = conn;
+                cmd2.CommandText = "SELECT * FROM iw.usuarios where id = " + idUsuario.ToString() + "";
+                cmd2.ExecuteNonQuery();
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
-            string exampleJson = null;
-            exampleJson = "{\n  \"password\" : \"aijsfbhausfbas\",\n  \"tipoUsuario\" : \"normal\",\n  \"id\" : 1,\n  \"nombre\" : \"Luis Alfonso\",\n  \"email\" : \"luis@gmail.com\",\n  \"nombreEmpresa\" : \"A reason\",\n  \"token\" : \"i989nasiudfbas54asd5as4da5s1d\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Usuario>(exampleJson)
-                        : default(Usuario);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                Usuario usuarioItem = new Usuario();
+                MySqlDataReader reader = cmd2.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    usuarioItem.Id = Convert.ToInt32(reader.GetString(0));
+                    usuarioItem.Nombre = reader.GetString(1);
+                    usuarioItem.Email = reader.GetString(2);
+                    usuarioItem.Password = reader.GetString(3);
+                    usuarioItem.Token = reader.GetString(4);
+                    usuarioItem.NombreEmpresa = reader.GetString(5);
+                    usuarioItem.TipoUsuario = reader.GetString(6);
+
+                    conn.Close();
+                    return StatusCode(200, usuarioItem);
+                }
+
+                InlineResponse404 resp3 = new InlineResponse404();
+                resp3.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                conn.Close();
+                return StatusCode(404, resp3);
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
+
+            return StatusCode(200, resp);
         }
+
 
         /// <summary>
         /// Devuelve una lista con todos los usuarios
@@ -208,22 +319,59 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult GetListaUsuarios([FromQuery][Required()]string token)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(InlineResponse2004));
+        {
+            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(InlineResponse400));
+            if (comprobarToken(token))
+            {
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                MySqlCommand cmd2 = new MySqlCommand();
+                cmd2.Connection = conn;
+                cmd2.CommandText = "SELECT * FROM iw.usuarios";
+                cmd2.ExecuteNonQuery();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
-            string exampleJson = null;
-            exampleJson = "{\n  \"data\" : [ {\n    \"password\" : \"aijsfbhausfbas\",\n    \"tipoUsuario\" : \"normal\",\n    \"id\" : 1,\n    \"nombre\" : \"Luis Alfonso\",\n    \"email\" : \"luis@gmail.com\",\n    \"nombreEmpresa\" : \"A reason\",\n    \"token\" : \"i989nasiudfbas54asd5as4da5s1d\"\n  }, {\n    \"password\" : \"aijsfbhausfbas\",\n    \"tipoUsuario\" : \"normal\",\n    \"id\" : 1,\n    \"nombre\" : \"Luis Alfonso\",\n    \"email\" : \"luis@gmail.com\",\n    \"nombreEmpresa\" : \"A reason\",\n    \"token\" : \"i989nasiudfbas54asd5as4da5s1d\"\n  } ]\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<InlineResponse2004>(exampleJson)
-                        : default(InlineResponse2004);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                Usuario usuarioItem = new Usuario();
+                MySqlDataReader reader = cmd2.ExecuteReader();
+                List<Usuario> listaUsuarios = new List<Usuario>();
+
+                while (reader.Read())
+                {
+                    usuarioItem = new Usuario();
+                    usuarioItem.Id = Convert.ToInt32(reader.GetString(0));
+                    usuarioItem.Nombre = reader.GetString(1);
+                    usuarioItem.Email = reader.GetString(2);
+                    usuarioItem.Password = reader.GetString(3);
+                    usuarioItem.Token = reader.GetString(4);
+                    usuarioItem.NombreEmpresa = reader.GetString(5);
+                    usuarioItem.TipoUsuario = reader.GetString(6);
+
+                    listaUsuarios.Add(usuarioItem);
+                }
+
+                if (listaUsuarios.Count > 0)
+                {
+                    conn.Close();
+                    return StatusCode(200, listaUsuarios);
+                }
+
+                InlineResponse404 resp3 = new InlineResponse404();
+                resp3.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                conn.Close();
+                return StatusCode(404, resp3);
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
         }
 
         /// <summary>
@@ -244,22 +392,70 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult ModificarUsuario([FromBody]UsuarioModificar body, [FromQuery][Required()]string token, [FromQuery][Required()]decimal? idUsuario)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Usuario));
+        {
+            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd3 = new MySqlCommand();
+                    cmd3.Connection = conn;
+                    cmd3.CommandText = "UPDATE iw.usuarios SET nombre='" + body.Nombre.ToString() + "', email='" + body.Email.ToString() + "', password='" + body.Password.ToString()
+                       + "', nombreEmpresa='" + body.NombreEmpresa.ToString() + "' where id = " + idUsuario.ToString() + "";
+                    cmd3.ExecuteNonQuery();
+                    conn.Close();
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
-            string exampleJson = null;
-            exampleJson = "{\n  \"password\" : \"aijsfbhausfbas\",\n  \"tipoUsuario\" : \"normal\",\n  \"id\" : 1,\n  \"nombre\" : \"Luis Alfonso\",\n  \"email\" : \"luis@gmail.com\",\n  \"nombreEmpresa\" : \"A reason\",\n  \"token\" : \"i989nasiudfbas54asd5as4da5s1d\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Usuario>(exampleJson)
-                        : default(Usuario);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    cmd2.CommandText = "SELECT * FROM iw.usuarios where id = " + idUsuario.ToString() + "";
+                    cmd2.ExecuteNonQuery();
+
+                    Usuario usuarioItem = new Usuario();
+                    MySqlDataReader reader = cmd2.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        usuarioItem.Id = Convert.ToInt32(reader.GetString(0));
+                        usuarioItem.Nombre = reader.GetString(1);
+                        usuarioItem.Email = reader.GetString(2);
+                        usuarioItem.Password = reader.GetString(3);
+                        usuarioItem.Token = reader.GetString(4);
+                        usuarioItem.NombreEmpresa = reader.GetString(5);
+                        usuarioItem.TipoUsuario = reader.GetString(6);
+
+                        conn.Close();
+                        return StatusCode(200, usuarioItem);
+                    }
+                    
+                    InlineResponse404 resp3 = new InlineResponse404();
+                    resp3.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                    conn.Close();
+                    return StatusCode(404, resp3);
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse404 resp3 = new InlineResponse404();
+                    resp3.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                    conn.Close();
+                    return StatusCode(404, resp3);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
         }
 
         /// <summary>
@@ -276,19 +472,53 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 201, type: typeof(InlineResponse201), description: "Nos devolverá el Token de ese usuario.")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult RegenerarToken([FromQuery][Required()]string token)
-        { 
-            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(201, default(InlineResponse201));
+        {
+            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse201 resp = new InlineResponse201();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
-            string exampleJson = null;
-            exampleJson = "{\n  \"Token\" : \"jbHBSFBUIAKONaiaoizfcja0f09kasndjan\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<InlineResponse201>(exampleJson)
-                        : default(InlineResponse201);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd3 = new MySqlCommand();
+                    cmd3.Connection = conn;
+                    string tokenGenerado = generarToken();
+                    cmd3.CommandText = "UPDATE iw.usuarios SET token='" + tokenGenerado + "' where token = '" + token + "'";
+                    cmd3.ExecuteNonQuery();
+                    conn.Close();
+
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd4 = new MySqlCommand();
+                    cmd4.Connection = conn;
+                    cmd4.CommandText = "UPDATE iw.almacentokens SET token='" + tokenGenerado + "' where token = '" + token + "'";
+                    cmd4.ExecuteNonQuery();
+                    conn.Close();
+
+                    resp.Token = tokenGenerado;
+                    return StatusCode(201, resp);
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse401 resp3 = new InlineResponse401();
+                    resp3.ErrorMessage = "ERROR_TOKEN";
+                    conn.Close();
+                    return StatusCode(401, resp3);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
         }
     }
 }
