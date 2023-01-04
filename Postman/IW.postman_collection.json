@@ -1,0 +1,191 @@
+{
+	"info": {
+		"_postman_id": "5371dae7-e8a1-41cd-ba3a-92f6e181cb85",
+		"name": "IW",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17616882"
+	},
+	"item": [
+		{
+			"name": "Usuario",
+			"item": [
+				{
+					"name": "DetallesUsuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/detallesUsuario?token=aijufnbiajunaijgbnagu&idUsuario=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"detallesUsuario"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "aijufnbiajunaijgbnagu"
+								},
+								{
+									"key": "idUsuario",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ListaUsuarios",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/listaUsuarios?token=aijufnbiajunaijgbnagu",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"listaUsuarios"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "aijufnbiajunaijgbnagu"
+								},
+								{
+									"key": "idUsuario",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CrearUsuario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Prueba2\",\r\n    \"email\": \"prueba2@gmail.com\",\r\n    \"password\": \"hola\",\r\n    \"nombreEmpresa\": \"Prueba2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/crearUsuario?token=aijufnbiajunaijgbnagu",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"crearUsuario"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "aijufnbiajunaijgbnagu"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ModificarUsuario",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nombre\": \"Prueba\",\r\n    \"email\": \"prueba@gmail.com\",\r\n    \"password\": \"hola\",\r\n    \"nombreEmpresa\": \"Prueba\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/modificarUsuario?token=aijufnbiajunaijgbnagu&idUsuario=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"modificarUsuario"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "aijufnbiajunaijgbnagu"
+								},
+								{
+									"key": "idUsuario",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RegenerarTokenUsuario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/regenerarTokenUsuario?token=aijufnbiajunaijgbnagu",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"regenerarTokenUsuario"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "aijufnbiajunaijgbnagu"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
