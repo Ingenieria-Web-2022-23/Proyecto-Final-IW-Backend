@@ -15,9 +15,13 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using IO.Swagger.Attributes;
-
+using MySql.Data.MySqlClient;
+using System.Data.SqlClient;
 using Microsoft.AspNetCore.Authorization;
 using IO.Swagger.Models;
+using static IO.Swagger.Models.Pagos;
+using System.Runtime.Serialization;
+using System.Linq;
 
 namespace IO.Swagger.Controllers
 { 
@@ -26,7 +30,38 @@ namespace IO.Swagger.Controllers
     /// </summary>
     [ApiController]
     public class PagosApiController : ControllerBase
-    { 
+    {
+        private MySqlConnection conn;
+        private bool comprobarToken(string token)
+        {
+            MySqlCommand cmd2 = new MySqlCommand();
+            cmd2.Connection = conn;
+            cmd2.CommandText = "SELECT * FROM iw.almacentokens where token = '" + token + "'";
+            cmd2.ExecuteNonQuery();
+            MySqlDataReader readerKey = cmd2.ExecuteReader();
+            bool comprobarKey = false;
+
+            while (readerKey.Read())
+            {
+                if (token == readerKey.GetString(1))
+                {
+                    comprobarKey = true;
+                    break;
+                }
+            }
+
+            return comprobarKey;
+        }
+        private string GetValue(EstadoEnum? paymentStatus)
+        {
+            EnumMemberAttribute attribute = paymentStatus
+                .GetType()
+                .GetField(paymentStatus.ToString())
+                .GetCustomAttributes(typeof(EnumMemberAttribute), false)
+                .SingleOrDefault() as EnumMemberAttribute;
+
+            return attribute?.Value;
+        }
         /// <summary>
         /// Obtiene todos los detalles de una transacción en específico
         /// </summary>
@@ -44,22 +79,69 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult GetDetallesPago([FromQuery][Required()]string token, [FromQuery][Required()]int? idPago)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Pagos));
+        {
+            string stringConexion = "server=localhost;port=3306;user id=root;password=adelfr.2000;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                MySqlCommand cmd2 = new MySqlCommand();
+                cmd2.Connection = conn;
+                cmd2.CommandText = "SELECT * FROM iw.pagos where id = " + idPago.ToString() + "";
+                cmd2.ExecuteNonQuery();
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
-            string exampleJson = null;
-            exampleJson = "{\n  \"detallesEstado\" : \"TARJETA DENEGADA\",\n  \"fecha\" : \"09-12-2022 09:55:23\",\n  \"total\" : 120.9,\n  \"estado\" : \"DENEGADO\",\n  \"concepto\" : \"Compra memoria RAM\",\n  \"id\" : 1,\n  \"devolucionId\" : 22,\n  \"referencia\" : \"515adfas54\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Pagos>(exampleJson)
-                        : default(Pagos);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                Pagos pagoItem = new Pagos();
+                MySqlDataReader reader = cmd2.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    pagoItem = new Pagos();
+                    pagoItem.Id = Convert.ToInt32(reader.GetString(0));
+                    pagoItem.Total = Convert.ToDecimal(reader.GetString(1));
+                    pagoItem.Concepto = reader.GetString(2);
+                    pagoItem.Referencia = reader.GetString(3);
+                    pagoItem.Fecha = reader.GetString(4);
+                    if (reader.GetString(5).Equals("EN_ESPERA"))
+                    {
+                        pagoItem.Estado = Pagos.EstadoEnum.ENESPERAEnum;
+                    }
+                    else
+                    {
+                        if (reader.GetString(5).Equals("ACEPTADO"))
+                        {
+                            pagoItem.Estado = Pagos.EstadoEnum.ACEPTADOEnum;
+                        }
+                        else
+                        {
+                            pagoItem.Estado = Pagos.EstadoEnum.DENEGADODEVOLUCINEnum;
+                        }
+                    }
+                    pagoItem.DetallesEstado = reader.GetString(6);
+
+                    conn.Close();
+                    return StatusCode(200, pagoItem);
+                }
+
+                InlineResponse404 resp3 = new InlineResponse404();
+                resp3.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                conn.Close();
+                return StatusCode(404, resp3);
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
+
+            return StatusCode(200, resp);
         }
 
         /// <summary>
@@ -76,19 +158,73 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 200, type: typeof(InlineResponse200), description: "Lista de los pagos del usuario")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult ListaPagos([FromQuery][Required()]string token)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(InlineResponse200));
+        {
+            string stringConexion = "server=localhost;port=3306;user id=root;password=adelfr.2000;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
-            string exampleJson = null;
-            exampleJson = "{\n  \"data\" : [ {\n    \"detallesEstado\" : \"TARJETA DENEGADA\",\n    \"fecha\" : \"09-12-2022 09:55:23\",\n    \"total\" : 120.9,\n    \"estado\" : \"DENEGADO\",\n    \"concepto\" : \"Compra memoria RAM\",\n    \"id\" : 1,\n    \"devolucionId\" : 22,\n    \"referencia\" : \"515adfas54\"\n  }, {\n    \"detallesEstado\" : \"TARJETA DENEGADA\",\n    \"fecha\" : \"09-12-2022 09:55:23\",\n    \"total\" : 120.9,\n    \"estado\" : \"DENEGADO\",\n    \"concepto\" : \"Compra memoria RAM\",\n    \"id\" : 1,\n    \"devolucionId\" : 22,\n    \"referencia\" : \"515adfas54\"\n  } ]\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<InlineResponse200>(exampleJson)
-                        : default(InlineResponse200);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            if (comprobarToken(token))
+            {
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                MySqlCommand cmd2 = new MySqlCommand();
+                cmd2.Connection = conn;
+                cmd2.CommandText = "SELECT * FROM iw.pagos";
+                cmd2.ExecuteNonQuery();
+
+                Pagos pagoItem = new Pagos();
+                MySqlDataReader reader = cmd2.ExecuteReader();
+                List<Pagos> listaPagos = new List<Pagos>();
+
+                while (reader.Read())
+                {
+                    pagoItem = new Pagos();
+                    pagoItem.Id = Convert.ToInt32(reader.GetString(0));
+                    pagoItem.Total = Convert.ToDecimal(reader.GetString(1));
+                    pagoItem.Concepto = reader.GetString(2);
+                    pagoItem.Referencia = reader.GetString(3);
+                    pagoItem.Fecha = reader.GetString(4);
+                    if (reader.GetString(5).Equals("EN_ESPERA"))
+                    {
+                        pagoItem.Estado = Pagos.EstadoEnum.ENESPERAEnum;
+                    }
+                    else
+                    {
+                        if (reader.GetString(5).Equals("ACEPTADO"))
+                        {
+                            pagoItem.Estado = Pagos.EstadoEnum.ACEPTADOEnum;
+                        }
+                        else
+                        {
+                            pagoItem.Estado = Pagos.EstadoEnum.DENEGADODEVOLUCINEnum;
+                        }
+                    }
+                    pagoItem.DetallesEstado = reader.GetString(6);
+
+                    listaPagos.Add(pagoItem);
+                }
+
+                if (listaPagos.Count > 0)
+                {
+                    conn.Close();
+                    return StatusCode(200, listaPagos);
+                }
+
+                InlineResponse404 resp3 = new InlineResponse404();
+                resp3.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                conn.Close();
+                return StatusCode(404, resp3);
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
         }
 
         /// <summary>
@@ -108,22 +244,50 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult RealizarPago([FromBody]Pagos body, [FromQuery][Required()]string token)
-        { 
-            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(201, default(Pagos));
+        {
+            string stringConexion = "server=localhost;port=3306;user id=root;password=adelfr.2000;database=iw;SslMode=none";
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse201 resp = new InlineResponse201();
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(InlineResponse400));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    string estado = GetValue(body.Estado);
+                    cmd2.CommandText = "INSERT INTO iw.pagos (total, concepto, referencia, fecha, estado, detallesEstado) VALUES ('" +
+                        body.Total.ToString() + "', '" + body.Concepto.ToString() + "', '" + body.Referencia.ToString()
+                        + "',now()" + ", '" + estado + "','"+body.DetallesEstado.ToString()+"');";
+                    cmd2.ExecuteNonQuery();
+                    conn.Close();
+                    resp.Token = token;
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse400 resp2 = new InlineResponse400();
+                    resp2.TypeError = "ERROR_PARAMETERS";
+                    resp2.MessageError = "Los parámetros introducidos son erroneos.";
+                    conn.Close();
+                    Console.WriteLine(e.ToString());
+                    return StatusCode(400, resp2);
+                }
+            }
+            else
+            {
+                InlineResponse400 resp2 = new InlineResponse400();
+                resp2.TypeError = "ERROR_PARAMETERS";
+                resp2.MessageError = "Los parámetros introducidos son erroneos.";
+                conn.Close();
+                return StatusCode(400, resp2);
+            }
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
-            string exampleJson = null;
-            exampleJson = "{\n  \"detallesEstado\" : \"TARJETA DENEGADA\",\n  \"fecha\" : \"09-12-2022 09:55:23\",\n  \"total\" : 120.9,\n  \"estado\" : \"DENEGADO\",\n  \"concepto\" : \"Compra memoria RAM\",\n  \"id\" : 1,\n  \"devolucionId\" : 22,\n  \"referencia\" : \"515adfas54\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Pagos>(exampleJson)
-                        : default(Pagos);            //TODO: Change the data returned
-            return new ObjectResult(example);
+            return StatusCode(201, resp);
         }
     }
 }
