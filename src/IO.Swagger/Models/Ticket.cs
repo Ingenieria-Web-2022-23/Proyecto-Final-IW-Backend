@@ -87,22 +87,22 @@ namespace IO.Swagger.Models
             /// Enum ABIERTOEnum for ABIERTO
             /// </summary>
             [EnumMember(Value = "ABIERTO")]
-            ABIERTOEnum = 0,
+            ABIERTO = 0,
             /// <summary>
             /// Enum CERRADOEnum for CERRADO
             /// </summary>
             [EnumMember(Value = "CERRADO")]
-            CERRADOEnum = 1,
+            CERRADO = 1,
             /// <summary>
             /// Enum ESPERAEnum for ESPERA
             /// </summary>
             [EnumMember(Value = "ESPERA")]
-            ESPERAEnum = 2,
+            ESPERA = 2,
             /// <summary>
             /// Enum CANCELADOEnum for CANCELADO
             /// </summary>
             [EnumMember(Value = "CANCELADO")]
-            CANCELADOEnum = 3        }
+            CANCELADO = 3        }
 
         /// <summary>
         /// Estado del ticket

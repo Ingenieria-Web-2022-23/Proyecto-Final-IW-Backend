@@ -31,7 +31,7 @@ namespace IO.Swagger.Models
         /// </summary>
 
         [DataMember(Name="data")]
-        public List<Pagos> Data { get; set; }
+        public List<Ticket> Data { get; set; }
 
         /// <summary>
         /// Returns the string presentation of the object
