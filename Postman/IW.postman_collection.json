@@ -1,9 +1,8 @@
 {
 	"info": {
-		"_postman_id": "5371dae7-e8a1-41cd-ba3a-92f6e181cb85",
+		"_postman_id": "0de27e20-aed4-422e-aa54-afbc16cfb31f",
 		"name": "IW",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "17616882"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
@@ -48,7 +47,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/listaUsuarios?token=aijufnbiajunaijgbnagu",
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/listaUsuarios?token=fG71e6AvMN83my4JnD4x9TvA0",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -64,7 +63,7 @@
 							"query": [
 								{
 									"key": "token",
-									"value": "aijufnbiajunaijgbnagu"
+									"value": "fG71e6AvMN83my4JnD4x9TvA0"
 								},
 								{
 									"key": "idUsuario",
@@ -162,7 +161,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/regenerarTokenUsuario?token=aijufnbiajunaijgbnagu",
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/regenerarTokenUsuario?token=SuHix07Pb8WR6uiBK9cwXFvc8",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -178,7 +177,212 @@
 							"query": [
 								{
 									"key": "token",
-									"value": "aijufnbiajunaijgbnagu"
+									"value": "SuHix07Pb8WR6uiBK9cwXFvc8"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Pagos",
+			"item": [
+				{
+					"name": "realizar pago",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"total\": 1800,\r\n  \"concepto\": \"Este es el pago por ordenador\",\r\n  \"referencia\": \"HP235\",\r\n  \"estado\": 2,\r\n  \"detallesEstado\": \"Buen estado\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/realizarPago?token=fG71e6AvMN83my4JnD4x9TvA0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"realizarPago"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "fG71e6AvMN83my4JnD4x9TvA0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Pagos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/listaPagos?token=fG71e6AvMN83my4JnD4x9TvA0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"listaPagos"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "fG71e6AvMN83my4JnD4x9TvA0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detalles pago",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/detallesPago?token=fG71e6AvMN83my4JnD4x9TvA0&idPago=4",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"detallesPago"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "fG71e6AvMN83my4JnD4x9TvA0"
+								},
+								{
+									"key": "idPago",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Devolucion",
+			"item": [
+				{
+					"name": "realizar devolucion",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/realizarDevolucion?token=fG71e6AvMN83my4JnD4x9TvA0&idPago=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"realizarDevolucion"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "fG71e6AvMN83my4JnD4x9TvA0"
+								},
+								{
+									"key": "idPago",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Devoluciones",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/listaDevoluciones?token=fG71e6AvMN83my4JnD4x9TvA0",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"listaDevoluciones"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "fG71e6AvMN83my4JnD4x9TvA0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detalles devolucion",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/detallesDevolucion?token=fG71e6AvMN83my4JnD4x9TvA0&idPago=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"detallesDevolucion"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "fG71e6AvMN83my4JnD4x9TvA0"
+								},
+								{
+									"key": "idPago",
+									"value": "1"
 								}
 							]
 						}
