@@ -51,27 +51,6 @@ namespace IO.Swagger.Controllers
             return comprobarKey;
         }
 
-        private bool comprobarTicket(string token)
-        {
-            MySqlCommand cmd2 = new MySqlCommand();
-            cmd2.Connection = conn;
-            cmd2.CommandText = "SELECT * FROM iw.almacentokens where token = '" + token + "'";
-            cmd2.ExecuteNonQuery();
-            MySqlDataReader readerKey = cmd2.ExecuteReader();
-            bool comprobarKey = false;
-
-            while (readerKey.Read())
-            {
-                if (token == readerKey.GetString(1))
-                {
-                    comprobarKey = true;
-                    break;
-                }
-            }
-
-            return comprobarKey;
-        }
-
         private string obtenerEmailAdmin()
         {
             string email = "";
@@ -108,17 +87,85 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult BorrarTicket([FromQuery][Required()]string token, [FromQuery][Required()]decimal? idTicket)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        {
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    cmd2.CommandText = "SELECT * FROM iw.tickets where id = " + idTicket.ToString();
+                    cmd2.ExecuteNonQuery();
+                    cmd2.Dispose();
+                    MySqlDataReader readerUsuario = cmd2.ExecuteReader();
+                    bool comprobarTicket = false;
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
+                    while (readerUsuario.Read())
+                    {
 
-            throw new NotImplementedException();
+                        if (idTicket == Convert.ToInt32(readerUsuario.GetString(0)))
+                        {
+                            comprobarTicket = true;
+                            break;
+                        }
+                    }
+
+                    if (comprobarTicket)
+                    {
+                        try
+                        {
+                            conn = new MySqlConnection(stringConexion);
+                            conn.Open();
+                            MySqlCommand cmd3 = new MySqlCommand();
+                            cmd3.Connection = conn;
+                            cmd3.CommandText = "DELETE FROM iw.tickets where id = " + idTicket.ToString();
+                            cmd3.ExecuteNonQuery();
+                            cmd3.Dispose();
+
+                            conn.Close();
+                            return StatusCode(200);
+
+                        }
+                        catch (MySqlException e)
+                        {
+                            InlineResponse404 resp2 = new InlineResponse404();
+                            resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                            conn.Close();
+                            return StatusCode(404, resp2);
+                        }
+                    }
+                    else
+                    {
+                        InlineResponse404 resp2 = new InlineResponse404();
+                        resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                        conn.Close();
+                        return StatusCode(404, resp2);
+                    }
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse404 resp2 = new InlineResponse404();
+                    resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                    conn.Close();
+                    return StatusCode(404, resp2);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+
+            }
         }
 
         /// <summary>
