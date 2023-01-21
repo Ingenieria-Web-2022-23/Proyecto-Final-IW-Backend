@@ -39,7 +39,7 @@ namespace IO.Swagger.Models
         /// <value>ID del usuario que abrió el ticket</value>
 
         [DataMember(Name="usuarioEncoder")]
-        public int? UsuarioEncoder { get; set; }
+        public string? UsuarioEncoder { get; set; }
 
         /// <summary>
         /// ID Administrador que contesta el ticket
@@ -47,7 +47,7 @@ namespace IO.Swagger.Models
         /// <value>ID Administrador que contesta el ticket</value>
 
         [DataMember(Name="administradorDecoder")]
-        public int? AdministradorDecoder { get; set; }
+        public string? AdministradorDecoder { get; set; }
 
         /// <summary>
         /// ID de la transacción a la que va vinculada el ticket
@@ -56,7 +56,7 @@ namespace IO.Swagger.Models
         [Required]
 
         [DataMember(Name="referenciaPago")]
-        public int? ReferenciaPago { get; set; }
+        public string? ReferenciaPago { get; set; }
 
         /// <summary>
         /// Asunto sobre el que trata la incidencia

@@ -18,6 +18,7 @@ using IO.Swagger.Attributes;
 
 using Microsoft.AspNetCore.Authorization;
 using IO.Swagger.Models;
+using MySql.Data.MySqlClient;
 
 namespace IO.Swagger.Controllers
 { 
@@ -26,7 +27,71 @@ namespace IO.Swagger.Controllers
     /// </summary>
     [ApiController]
     public class TicketsApiController : ControllerBase
-    { 
+    {
+        private MySqlConnection conn;
+        private string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+        private bool comprobarToken(string token)
+        {
+            MySqlCommand cmd2 = new MySqlCommand();
+            cmd2.Connection = conn;
+            cmd2.CommandText = "SELECT * FROM iw.almacentokens where token = '" + token + "'";
+            cmd2.ExecuteNonQuery();
+            MySqlDataReader readerKey = cmd2.ExecuteReader();
+            bool comprobarKey = false;
+
+            while (readerKey.Read())
+            {
+                if (token == readerKey.GetString(1))
+                {
+                    comprobarKey = true;
+                    break;
+                }
+            }
+
+            return comprobarKey;
+        }
+
+        private bool comprobarTicket(string token)
+        {
+            MySqlCommand cmd2 = new MySqlCommand();
+            cmd2.Connection = conn;
+            cmd2.CommandText = "SELECT * FROM iw.almacentokens where token = '" + token + "'";
+            cmd2.ExecuteNonQuery();
+            MySqlDataReader readerKey = cmd2.ExecuteReader();
+            bool comprobarKey = false;
+
+            while (readerKey.Read())
+            {
+                if (token == readerKey.GetString(1))
+                {
+                    comprobarKey = true;
+                    break;
+                }
+            }
+
+            return comprobarKey;
+        }
+
+        private string obtenerEmailAdmin()
+        {
+            string email = "";
+
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd4 = new MySqlCommand();
+            cmd4.Connection = conn;
+            cmd4.CommandText = "SELECT * FROM iw.administradores ORDER BY RAND() LIMIT 1;";
+            cmd4.ExecuteNonQuery();
+
+            MySqlDataReader reader = cmd4.ExecuteReader();
+
+            while (reader.Read())
+            {
+                email = reader.GetString(0);
+            }
+            return email;
+        }
+
         /// <summary>
         /// Podremos borrar un ticket en especifico
         /// </summary>
@@ -73,22 +138,57 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult CrearTicket([FromBody]Ticket body, [FromQuery][Required()]string token)
-        { 
-            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(201, default(Ticket));
+        {
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse201 resp = new InlineResponse201();
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(InlineResponse400));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    string emailAdmin = obtenerEmailAdmin();
+                    cmd2.CommandText = "INSERT INTO iw.tickets (referenciaPago, asunto, descripcion, status, valoracion, fk_usuario, fk_administrador) VALUES ('" +
+                        body.ReferenciaPago.ToString() + "', '" + body.Asunto.ToString() + "', '" + body.Descripcion.ToString() + "', '" + Ticket.StatusEnum.ABIERTOEnum.ToString() + "', 0, '" 
+                        + body.UsuarioEncoder.ToString() + "', '" + emailAdmin + "')";
+                    cmd2.ExecuteNonQuery();
+                    conn.Close();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
-            string exampleJson = null;
-            exampleJson = "{\n  \"descripcion\" : \"El usuario realizó el pago pero ha habido algún tipo de error con el banco.\",\n  \"administradorDecoder\" : 3,\n  \"referenciaPago\" : 215961312,\n  \"asunto\" : \"Problema con la transacción\",\n  \"id\" : 1231,\n  \"usuarioEncoder\" : 475415,\n  \"status\" : \"ESPERA\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Ticket>(exampleJson)
-                        : default(Ticket);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                    Ticket ticket = new Ticket();
+                    ticket.ReferenciaPago = body.ReferenciaPago;
+                    ticket.Asunto = body.Asunto.ToString();
+                    ticket.Descripcion = body.Descripcion.ToString();
+                    ticket.Status = Ticket.StatusEnum.ABIERTOEnum;
+                    ticket.UsuarioEncoder = body.UsuarioEncoder.ToString();
+                    ticket.AdministradorDecoder = emailAdmin;
+
+                    return StatusCode(201, ticket);
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse400 resp2 = new InlineResponse400();
+                    resp2.TypeError = "ERROR_PARAMETERS";
+                    resp2.MessageError = "Los parámetros introducidos son erroneos.";
+                    conn.Close();
+                    Console.WriteLine(e.ToString());
+                    return StatusCode(400, resp2);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
+
+            return StatusCode(201, resp);
         }
 
         /// <summary>
