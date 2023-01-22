@@ -71,6 +71,27 @@ namespace IO.Swagger.Controllers
             return email;
         }
 
+
+        private int obtenerIDMensaje()
+        {
+            int id = -1;
+
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd4 = new MySqlCommand();
+            cmd4.Connection = conn;
+            cmd4.CommandText = "select max(id) as id from mensajes;";
+            cmd4.ExecuteNonQuery();
+
+            MySqlDataReader reader = cmd4.ExecuteReader();
+
+            while (reader.Read())
+            {
+                id = Convert.ToInt32(reader.GetString(0));
+            }
+            return id;
+        }
+
         /// <summary>
         /// Podremos borrar un ticket en especifico
         /// </summary>
@@ -256,17 +277,54 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult EnviarMensaje([FromBody]Mensaje body, [FromQuery][Required()]string token, [FromQuery][Required()]decimal? idTicket)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        {
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse201 resp = new InlineResponse201();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    cmd2.CommandText = "INSERT INTO iw.mensajes (contenido, fk_usuario_mensajes) VALUES ('" +
+                        body.Contenido.ToString() + "', '" + body.emailUsuario.ToString() + "')";
+                    cmd2.ExecuteNonQuery();
+                    conn.Close();
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd3 = new MySqlCommand();
+                    cmd3.Connection = conn;
+                    int idMensaje = obtenerIDMensaje();
+                    cmd3.CommandText = "INSERT INTO iw.mensajes_ticket (fk_mensaje, fk_ticket) VALUES (" + idMensaje.ToString() + ", " + idTicket.ToString() + ")";
+                    cmd3.ExecuteNonQuery();
+                    
+                    conn.Close();
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse404 resp2 = new InlineResponse404();
+                    resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                    conn.Close();
+                    Console.WriteLine(e.ToString());
+                    return StatusCode(400, resp2);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
 
-            throw new NotImplementedException();
+            return StatusCode(202, "Mensaje enviado correctamente");
         }
 
         /// <summary>

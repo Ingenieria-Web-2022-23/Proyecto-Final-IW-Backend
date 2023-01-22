@@ -39,8 +39,8 @@ namespace IO.Swagger.Models
         /// <value>Usuario que envió el mensaje</value>
         [Required]
 
-        [DataMember(Name="idUsuario")]
-        public int? IdUsuario { get; set; }
+        [DataMember(Name="emailUsuario")]
+        public string emailUsuario { get; set; }
 
         /// <summary>
         /// Fecha creación
@@ -68,7 +68,7 @@ namespace IO.Swagger.Models
             var sb = new StringBuilder();
             sb.Append("class Mensaje {\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
-            sb.Append("  IdUsuario: ").Append(IdUsuario).Append("\n");
+            sb.Append("  IdUsuario: ").Append(emailUsuario).Append("\n");
             sb.Append("  Fecha: ").Append(Fecha).Append("\n");
             sb.Append("  Contenido: ").Append(Contenido).Append("\n");
             sb.Append("}\n");
@@ -113,9 +113,9 @@ namespace IO.Swagger.Models
                     Id.Equals(other.Id)
                 ) && 
                 (
-                    IdUsuario == other.IdUsuario ||
-                    IdUsuario != null &&
-                    IdUsuario.Equals(other.IdUsuario)
+                    emailUsuario == other.emailUsuario ||
+                    emailUsuario != null &&
+                    emailUsuario.Equals(other.emailUsuario)
                 ) && 
                 (
                     Fecha == other.Fecha ||
@@ -141,8 +141,8 @@ namespace IO.Swagger.Models
                 // Suitable nullity checks etc, of course :)
                     if (Id != null)
                     hashCode = hashCode * 59 + Id.GetHashCode();
-                    if (IdUsuario != null)
-                    hashCode = hashCode * 59 + IdUsuario.GetHashCode();
+                    if (emailUsuario != null)
+                    hashCode = hashCode * 59 + emailUsuario.GetHashCode();
                     if (Fecha != null)
                     hashCode = hashCode * 59 + Fecha.GetHashCode();
                     if (Contenido != null)
