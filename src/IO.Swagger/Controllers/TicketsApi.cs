@@ -18,6 +18,7 @@ using IO.Swagger.Attributes;
 
 using Microsoft.AspNetCore.Authorization;
 using IO.Swagger.Models;
+using MySql.Data.MySqlClient;
 
 namespace IO.Swagger.Controllers
 { 
@@ -26,7 +27,71 @@ namespace IO.Swagger.Controllers
     /// </summary>
     [ApiController]
     public class TicketsApiController : ControllerBase
-    { 
+    {
+        private MySqlConnection conn;
+        private string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+        private bool comprobarToken(string token)
+        {
+            MySqlCommand cmd2 = new MySqlCommand();
+            cmd2.Connection = conn;
+            cmd2.CommandText = "SELECT * FROM iw.almacentokens where token = '" + token + "'";
+            cmd2.ExecuteNonQuery();
+            MySqlDataReader readerKey = cmd2.ExecuteReader();
+            bool comprobarKey = false;
+
+            while (readerKey.Read())
+            {
+                if (token == readerKey.GetString(1))
+                {
+                    comprobarKey = true;
+                    break;
+                }
+            }
+
+            return comprobarKey;
+        }
+
+        private string obtenerEmailAdmin()
+        {
+            string email = "";
+
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd4 = new MySqlCommand();
+            cmd4.Connection = conn;
+            cmd4.CommandText = "SELECT * FROM iw.administradores ORDER BY RAND() LIMIT 1;";
+            cmd4.ExecuteNonQuery();
+
+            MySqlDataReader reader = cmd4.ExecuteReader();
+
+            while (reader.Read())
+            {
+                email = reader.GetString(0);
+            }
+            return email;
+        }
+
+
+        private int obtenerIDMensaje()
+        {
+            int id = -1;
+
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd4 = new MySqlCommand();
+            cmd4.Connection = conn;
+            cmd4.CommandText = "select max(id) as id from mensajes;";
+            cmd4.ExecuteNonQuery();
+
+            MySqlDataReader reader = cmd4.ExecuteReader();
+
+            while (reader.Read())
+            {
+                id = Convert.ToInt32(reader.GetString(0));
+            }
+            return id;
+        }
+
         /// <summary>
         /// Podremos borrar un ticket en especifico
         /// </summary>
@@ -43,17 +108,85 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult BorrarTicket([FromQuery][Required()]string token, [FromQuery][Required()]decimal? idTicket)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        {
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    cmd2.CommandText = "SELECT * FROM iw.tickets where id = " + idTicket.ToString();
+                    cmd2.ExecuteNonQuery();
+                    cmd2.Dispose();
+                    MySqlDataReader readerUsuario = cmd2.ExecuteReader();
+                    bool comprobarTicket = false;
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
+                    while (readerUsuario.Read())
+                    {
 
-            throw new NotImplementedException();
+                        if (idTicket == Convert.ToInt32(readerUsuario.GetString(0)))
+                        {
+                            comprobarTicket = true;
+                            break;
+                        }
+                    }
+
+                    if (comprobarTicket)
+                    {
+                        try
+                        {
+                            conn = new MySqlConnection(stringConexion);
+                            conn.Open();
+                            MySqlCommand cmd3 = new MySqlCommand();
+                            cmd3.Connection = conn;
+                            cmd3.CommandText = "DELETE FROM iw.tickets where id = " + idTicket.ToString();
+                            cmd3.ExecuteNonQuery();
+                            cmd3.Dispose();
+
+                            conn.Close();
+                            return StatusCode(200);
+
+                        }
+                        catch (MySqlException e)
+                        {
+                            InlineResponse404 resp2 = new InlineResponse404();
+                            resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                            conn.Close();
+                            return StatusCode(404, resp2);
+                        }
+                    }
+                    else
+                    {
+                        InlineResponse404 resp2 = new InlineResponse404();
+                        resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                        conn.Close();
+                        return StatusCode(404, resp2);
+                    }
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse404 resp2 = new InlineResponse404();
+                    resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                    conn.Close();
+                    return StatusCode(404, resp2);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+
+            }
         }
 
         /// <summary>
@@ -73,22 +206,59 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult CrearTicket([FromBody]Ticket body, [FromQuery][Required()]string token)
-        { 
-            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(201, default(Ticket));
+        {
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse201 resp = new InlineResponse201();
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(InlineResponse400));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    string emailAdmin = obtenerEmailAdmin();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
-            string exampleJson = null;
-            exampleJson = "{\n  \"descripcion\" : \"El usuario realizó el pago pero ha habido algún tipo de error con el banco.\",\n  \"administradorDecoder\" : 3,\n  \"referenciaPago\" : 215961312,\n  \"asunto\" : \"Problema con la transacción\",\n  \"id\" : 1231,\n  \"usuarioEncoder\" : 475415,\n  \"status\" : \"ESPERA\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Ticket>(exampleJson)
-                        : default(Ticket);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                    cmd2.CommandText = "INSERT INTO iw.tickets (referenciaPago, asunto, descripcion, status, valoracion, fk_usuario, fk_administrador) VALUES ('" +
+                        body.ReferenciaPago.ToString() + "', '" + body.Asunto.ToString() + "', '" + body.Descripcion.ToString() + "', '" + Ticket.StatusEnum.ABIERTO + "', 0, '" 
+                        + body.UsuarioEncoder.ToString() + "', '" + emailAdmin + "')";
+                    cmd2.ExecuteNonQuery();
+                    conn.Close();
+
+                    Ticket ticket = new Ticket();
+                    ticket.ReferenciaPago = body.ReferenciaPago;
+                    ticket.Asunto = body.Asunto.ToString();
+                    ticket.Descripcion = body.Descripcion.ToString();
+                    ticket.Status = Ticket.StatusEnum.ABIERTO;
+                    ticket.UsuarioEncoder = body.UsuarioEncoder.ToString();
+                    ticket.AdministradorDecoder = emailAdmin;
+                    ticket.valoracion = 0;
+
+                    return StatusCode(201, ticket);
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse400 resp2 = new InlineResponse400();
+                    resp2.TypeError = "ERROR_PARAMETERS";
+                    resp2.MessageError = "Los parámetros introducidos son erroneos.";
+                    conn.Close();
+                    Console.WriteLine(e.ToString());
+                    return StatusCode(400, resp2);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
+
+            return StatusCode(201, resp);
         }
 
         /// <summary>
@@ -108,17 +278,54 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult EnviarMensaje([FromBody]Mensaje body, [FromQuery][Required()]string token, [FromQuery][Required()]decimal? idTicket)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200);
+        {
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse201 resp = new InlineResponse201();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    cmd2.CommandText = "INSERT INTO iw.mensajes (contenido, fk_usuario_mensajes) VALUES ('" +
+                        body.Contenido.ToString() + "', '" + body.emailUsuario.ToString() + "')";
+                    cmd2.ExecuteNonQuery();
+                    conn.Close();
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd3 = new MySqlCommand();
+                    cmd3.Connection = conn;
+                    int idMensaje = obtenerIDMensaje();
+                    cmd3.CommandText = "INSERT INTO iw.mensajes_ticket (fk_mensaje, fk_ticket) VALUES (" + idMensaje.ToString() + ", " + idTicket.ToString() + ")";
+                    cmd3.ExecuteNonQuery();
+                    
+                    conn.Close();
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse404 resp2 = new InlineResponse404();
+                    resp2.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                    conn.Close();
+                    Console.WriteLine(e.ToString());
+                    return StatusCode(400, resp2);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
 
-            throw new NotImplementedException();
+            return StatusCode(202, "Mensaje enviado correctamente");
         }
 
         /// <summary>
@@ -138,22 +345,46 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult GetChatTicket([FromQuery][Required()]string token, [FromQuery][Required()]decimal? idTicket)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(InlineResponse2003));
+        {
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                MySqlCommand cmd2 = new MySqlCommand();
+                cmd2.Connection = conn;
+                cmd2.CommandText = "select id, fecha, contenido, fk_usuario_mensajes from mensajes " +
+                    "join mensajes_ticket on mensajes.id = mensajes_ticket.fk_ticket and fk_ticket = " + idTicket.ToString() + ";";
+                cmd2.ExecuteNonQuery();
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
-            string exampleJson = null;
-            exampleJson = "{\n  \"data\" : [ {\n    \"fecha\" : \"2022-12-12 08:16:22\",\n    \"contenido\" : \"Sigue sin poder confirmar el pago desde el banco\",\n    \"idUsuario\" : 156,\n    \"id\" : 51551\n  }, {\n    \"fecha\" : \"2022-12-12 08:16:22\",\n    \"contenido\" : \"Sigue sin poder confirmar el pago desde el banco\",\n    \"idUsuario\" : 156,\n    \"id\" : 51551\n  } ]\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<InlineResponse2003>(exampleJson)
-                        : default(InlineResponse2003);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                MySqlDataReader reader = cmd2.ExecuteReader();
+                List<Mensaje> listMensaje = new List<Mensaje>();
+                while (reader.Read())
+                {
+                    Mensaje mensaje = new Mensaje();
+                    mensaje.Id = Convert.ToInt32(reader.GetString(0));
+                    mensaje.Fecha = reader.GetString(1);
+                    mensaje.Contenido = reader.GetString(2);
+                    mensaje.emailUsuario = reader.GetString(3);
+
+                    listMensaje.Add(mensaje);
+                }
+
+                conn.Close();
+                return StatusCode(200, listMensaje);
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
         }
 
         /// <summary>
@@ -173,22 +404,67 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult GetDetallesTicket([FromQuery][Required()]string token, [FromQuery][Required()]decimal? idTicket)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Ticket));
+        {
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
+            if (comprobarToken(token))
+            {
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                MySqlCommand cmd2 = new MySqlCommand();
+                cmd2.Connection = conn;
+                cmd2.CommandText = "SELECT * FROM iw.tickets where id = " + idTicket.ToString() + "";
+                cmd2.ExecuteNonQuery();
 
-            //TODO: Uncomment the next line to return response 404 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(404, default(InlineResponse404));
-            string exampleJson = null;
-            exampleJson = "{\n  \"descripcion\" : \"El usuario realizó el pago pero ha habido algún tipo de error con el banco.\",\n  \"administradorDecoder\" : 3,\n  \"referenciaPago\" : 215961312,\n  \"asunto\" : \"Problema con la transacción\",\n  \"id\" : 1231,\n  \"usuarioEncoder\" : 475415,\n  \"status\" : \"ESPERA\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Ticket>(exampleJson)
-                        : default(Ticket);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                Ticket ticket = new Ticket();
+                MySqlDataReader reader = cmd2.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    ticket.Id = Convert.ToInt32(reader.GetString(0));
+                    ticket.ReferenciaPago = reader.GetString(1);
+                    ticket.Asunto = reader.GetString(2);
+                    ticket.Descripcion = reader.GetString(3);
+                    switch (reader.GetString(4))
+                    {
+                        case "ABIERTO":
+                            ticket.Status = Ticket.StatusEnum.ABIERTO;
+                            break;
+                        case "CERRADO":
+                            ticket.Status = Ticket.StatusEnum.CERRADO;
+                            break;
+                        case "ESPERA":
+                            ticket.Status = Ticket.StatusEnum.ESPERA;
+                            break;
+                        case "CANCELADO":
+                            ticket.Status = Ticket.StatusEnum.CANCELADO;
+                            break;
+                    }
+
+                    ticket.valoracion = Convert.ToInt32(reader.GetString(5));
+                    ticket.UsuarioEncoder = reader.GetString(6);
+                    ticket.AdministradorDecoder = reader.GetString(7);
+
+                    conn.Close();
+                    return StatusCode(200, ticket);
+                }
+
+                InlineResponse404 resp3 = new InlineResponse404();
+                resp3.ErrorMessage = "ERROR_RECURSO_NO_ENCONTRADO";
+                conn.Close();
+                return StatusCode(404, resp3);
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
         }
 
         /// <summary>
@@ -208,22 +484,69 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult GetListaTickets([FromQuery][Required()]string token, [FromQuery]string estadoFiltro)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(InlineResponse2002));
+        {
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(InlineResponse400));
+            if (comprobarToken(token))
+            {
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                MySqlCommand cmd2 = new MySqlCommand();
+                cmd2.Connection = conn;
+                cmd2.CommandText = "SELECT * FROM iw.tickets";
+                cmd2.ExecuteNonQuery();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
-            string exampleJson = null;
-            exampleJson = "{\n  \"data\" : [ {\n    \"descripcion\" : \"El usuario realizó el pago pero ha habido algún tipo de error con el banco.\",\n    \"administradorDecoder\" : 3,\n    \"referenciaPago\" : 215961312,\n    \"asunto\" : \"Problema con la transacción\",\n    \"id\" : 1231,\n    \"usuarioEncoder\" : 475415,\n    \"status\" : \"ESPERA\"\n  }, {\n    \"descripcion\" : \"El usuario realizó el pago pero ha habido algún tipo de error con el banco.\",\n    \"administradorDecoder\" : 3,\n    \"referenciaPago\" : 215961312,\n    \"asunto\" : \"Problema con la transacción\",\n    \"id\" : 1231,\n    \"usuarioEncoder\" : 475415,\n    \"status\" : \"ESPERA\"\n  } ]\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<InlineResponse2002>(exampleJson)
-                        : default(InlineResponse2002);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                MySqlDataReader reader = cmd2.ExecuteReader();
+                List<Ticket> listTickets = new List<Ticket>();
+                while (reader.Read())
+                {
+                    if (reader.GetString(4) != estadoFiltro)
+                    {
+                        continue;
+                    }
+
+                    Ticket ticket = new Ticket();
+                    ticket.Id = Convert.ToInt32(reader.GetString(0));
+                    ticket.ReferenciaPago = reader.GetString(1);
+                    ticket.Asunto = reader.GetString(2);
+                    ticket.Descripcion = reader.GetString(3);
+                    switch (reader.GetString(4))
+                    {
+                        case "ABIERTO":
+                            ticket.Status = Ticket.StatusEnum.ABIERTO;
+                            break;
+                        case "CERRADO":
+                            ticket.Status = Ticket.StatusEnum.CERRADO;
+                            break;
+                        case "ESPERA":
+                            ticket.Status = Ticket.StatusEnum.ESPERA;
+                            break;
+                        case "CANCELADO":
+                            ticket.Status = Ticket.StatusEnum.CANCELADO;
+                            break;
+                    }
+                    ticket.valoracion = Convert.ToInt32(reader.GetString(5));
+                    ticket.UsuarioEncoder = reader.GetString(6);
+                    ticket.AdministradorDecoder = reader.GetString(7);
+
+                    listTickets.Add(ticket);
+                }
+
+                conn.Close();
+                resp.Data = listTickets;
+                return StatusCode(200, resp);
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
         }
 
         /// <summary>
@@ -244,22 +567,85 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult ValorarTicket([FromBody]Valoracion body, [FromQuery][Required()]string token, [FromQuery][Required()]decimal? idTicket)
-        { 
-            //TODO: Uncomment the next line to return response 200 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(200, default(Ticket));
+        {
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd = new MySqlCommand();
+            cmd.Connection = conn;
+            InlineResponse200 resp = new InlineResponse200();
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(InlineResponse400));
+            if (comprobarToken(token))
+            {
+                try
+                {
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    MySqlCommand cmd3 = new MySqlCommand();
+                    cmd3.Connection = conn;
+                    cmd3.CommandText = "UPDATE iw.tickets SET valoracion=" + body.Numero.ToString() + " where id = " + idTicket.ToString() + ";";
+                    cmd3.ExecuteNonQuery();
+                    conn.Close();
 
-            //TODO: Uncomment the next line to return response 401 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(401, default(InlineResponse401));
-            string exampleJson = null;
-            exampleJson = "{\n  \"descripcion\" : \"El usuario realizó el pago pero ha habido algún tipo de error con el banco.\",\n  \"administradorDecoder\" : 3,\n  \"referenciaPago\" : 215961312,\n  \"asunto\" : \"Problema con la transacción\",\n  \"id\" : 1231,\n  \"usuarioEncoder\" : 475415,\n  \"status\" : \"ESPERA\"\n}";
-            
-                        var example = exampleJson != null
-                        ? JsonConvert.DeserializeObject<Ticket>(exampleJson)
-                        : default(Ticket);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                    conn.Open();
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd2.Connection = conn;
+                    cmd2.CommandText = "SELECT * FROM iw.tickets where id = " + idTicket.ToString() + "";
+                    cmd2.ExecuteNonQuery();
+
+                    Ticket ticket = new Ticket();
+                    MySqlDataReader reader = cmd2.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        ticket.Id = Convert.ToInt32(reader.GetString(0));
+                        ticket.ReferenciaPago = reader.GetString(1);
+                        ticket.Asunto = reader.GetString(2);
+                        ticket.Descripcion = reader.GetString(3);
+                        switch (reader.GetString(4))
+                        {
+                            case "ABIERTO":
+                                ticket.Status = Ticket.StatusEnum.ABIERTO;
+                                break;
+                            case "CERRADO":
+                                ticket.Status = Ticket.StatusEnum.CERRADO;
+                                break;
+                            case "ESPERA":
+                                ticket.Status = Ticket.StatusEnum.ESPERA;
+                                break;
+                            case "CANCELADO":
+                                ticket.Status = Ticket.StatusEnum.CANCELADO;
+                                break;
+                        }
+                        ticket.valoracion = Convert.ToInt32(reader.GetString(5));
+                        ticket.UsuarioEncoder = reader.GetString(6);
+                        ticket.AdministradorDecoder = reader.GetString(7);
+
+                        conn.Close();
+                        return StatusCode(200, ticket);
+                    }
+
+                    InlineResponse400 resp3 = new InlineResponse400();
+                    resp3.TypeError = "ERROR_PARAMETERS";
+                    resp3.MessageError = "Los parámetros introducidos son erroneos.";
+                    conn.Close();
+                    return StatusCode(404, resp3);
+                }
+                catch (MySqlException e)
+                {
+                    InlineResponse400 resp3 = new InlineResponse400();
+                    resp3.TypeError = "ERROR_PARAMETERS";
+                    resp3.MessageError = "Los parámetros introducidos son erroneos.";
+                    conn.Close();
+                    return StatusCode(404, resp3);
+                }
+            }
+            else
+            {
+                InlineResponse401 resp2 = new InlineResponse401();
+                resp2.ErrorMessage = "ERROR_TOKEN";
+                conn.Close();
+                return StatusCode(401, resp2);
+            }
         }
     }
 }
