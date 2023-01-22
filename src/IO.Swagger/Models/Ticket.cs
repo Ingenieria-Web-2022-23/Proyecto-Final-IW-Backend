@@ -49,6 +49,10 @@ namespace IO.Swagger.Models
         [DataMember(Name="administradorDecoder")]
         public string? AdministradorDecoder { get; set; }
 
+        //metido por Luis
+        [DataMember(Name = "valoracion")]
+        public int? valoracion { get; set; }
+
         /// <summary>
         /// ID de la transacción a la que va vinculada el ticket
         /// </summary>
@@ -65,7 +69,7 @@ namespace IO.Swagger.Models
         [Required]
 
         [DataMember(Name="asunto")]
-        public string Asunto { get; set; }
+        public string? Asunto { get; set; }
 
         /// <summary>
         /// Descripción y explicación de la incidencia por la que se ha abierto el ticket
