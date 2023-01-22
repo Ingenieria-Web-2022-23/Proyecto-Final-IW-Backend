@@ -183,6 +183,38 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"prueba@gmail.com\",\r\n    \"password\": \"hola\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:50352/lac56-alu/TPVV/1.0.0/tpvv/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "50352",
+							"path": [
+								"lac56-alu",
+								"TPVV",
+								"1.0.0",
+								"tpvv",
+								"login"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
