@@ -23,6 +23,7 @@ namespace IO.Swagger.Controllers
     public class SeguridadApiController : ControllerBase
     {
         private MySqlConnection conn;
+        string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
         /// <summary>
         /// Se obtiene el token único del usuario
         /// </summary>
@@ -37,23 +38,42 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 201, type: typeof(InlineResponse201), description: "Nos devolverá el Token de ese usuario.")]
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         [SwaggerResponse(statusCode: 403, type: typeof(InlineResponse403), description: "El cliente no posee los permisos necesarios para cierto contenido, por lo que el servidor está rechazando otorgar una respuesta apropiada.")]
-        public virtual IActionResult GetToken()
+        public virtual IActionResult GetToken([FromQuery] decimal? idUsuario)
         {
-            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(201, default(InlineResponse201));
+            conn = new MySqlConnection(stringConexion);
+            conn.Open();
+            MySqlCommand cmd2 = new MySqlCommand();
+            cmd2.Connection = conn;
+            try
+            {
+                cmd2.CommandText = "SELECT token FROM iw.almacentokens where id = " + idUsuario.ToString() + "";
+                cmd2.ExecuteNonQuery();
 
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(InlineResponse400));
+                Usuario usuarioItem = new Usuario();
+                MySqlDataReader reader = cmd2.ExecuteReader();
+                string tokenUsuario = "";
 
-            //TODO: Uncomment the next line to return response 403 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(403, default(InlineResponse403));
-            string exampleJson = null;
-            exampleJson = "{\n  \"Token\" : \"jbHBSFBUIAKONaiaoizfcja0f09kasndjan\"\n}";
+                while (reader.Read())
+                {
+                    tokenUsuario = reader.GetString(0);
 
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<InlineResponse201>(exampleJson)
-            : default(InlineResponse201);            //TODO: Change the data returned
-            return new ObjectResult(example);
+                    conn.Close();
+                    return StatusCode(201, tokenUsuario);
+                }
+
+                InlineResponse403 resp3 = new InlineResponse403();
+                resp3.TypeError = "ERROR_CREDENTIALS";
+                resp3.MessageError = "Ha habido algún error en las credenciales introducidas";
+                conn.Close();
+                return StatusCode(404, resp3);
+            }
+            catch (MySqlException e)
+            {
+                InlineResponse404 resp3 = new InlineResponse404();
+                resp3.ErrorMessage = "ERROR_PARAMETERS";
+                conn.Close();
+                return StatusCode(404, resp3);
+            }  
         }
 
         /// <summary>
@@ -110,35 +130,6 @@ namespace IO.Swagger.Controllers
                 }
             }
             return StatusCode(201, resp);
-        }
-
-        /// <summary>
-        /// Se da de alta a un nuevo usuario en nuestro sistema
-        /// </summary>
-        /// <remarks>Podremos aregrar nuevos usuario/clientes a nuestro sistema a través de un sencillo formulario de registro.</remarks>
-        /// <param name="body"></param>
-        /// <response code="201">Registro realizado correctamente</response>
-        /// <response code="400">Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.</response>
-        [HttpPut]
-        [Route("/lac56-alu/TPVV/1.0.0/tpvv/registro")]
-        [ValidateModelState]
-        [SwaggerOperation("Registro")]
-        [SwaggerResponse(statusCode: 201, type: typeof(Usuario), description: "Registro realizado correctamente")]
-        [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
-        public virtual IActionResult Registro([FromBody] Registro body)
-        {
-            //TODO: Uncomment the next line to return response 201 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(201, default(Usuario));
-
-            //TODO: Uncomment the next line to return response 400 or use other options such as return this.NotFound(), return this.BadRequest(..), ...
-            // return StatusCode(400, default(InlineResponse400));
-            string exampleJson = null;
-            exampleJson = "{\n  \"password\" : \"aijsfbhausfbas\",\n  \"tipoUsuario\" : \"normal\",\n  \"id\" : 1,\n  \"nombre\" : \"Luis Alfonso\",\n  \"email\" : \"luis@gmail.com\",\n  \"nombreEmpresa\" : \"A reason\",\n  \"token\" : \"i989nasiudfbas54asd5as4da5s1d\"\n}";
-
-            var example = exampleJson != null
-            ? JsonConvert.DeserializeObject<Usuario>(exampleJson)
-            : default(Usuario);            //TODO: Change the data returned
-            return new ObjectResult(example);
         }
     }
 }

@@ -29,6 +29,7 @@ namespace IO.Swagger.Controllers
     public class UsuarioApiController : ControllerBase
     {
         private MySqlConnection conn;
+        string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
         private bool comprobarToken(string token)
         {
             MySqlCommand cmd2 = new MySqlCommand();
@@ -84,7 +85,6 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult BorrarUsuario([FromQuery][Required()]string token, [FromQuery][Required()]decimal? idUsuario)
         {
-            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();
@@ -180,7 +180,6 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         public virtual IActionResult CrearUsuario([FromBody]Usuario body, [FromQuery][Required()]string token)
         {
-            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();
@@ -253,7 +252,6 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult GetDetallesUsuario([FromQuery][Required()] string token, [FromQuery][Required()] decimal? idUsuario)
         {
-            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();
@@ -320,7 +318,6 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult GetListaUsuarios([FromQuery][Required()]string token)
         {
-            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();
@@ -393,7 +390,6 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 404, type: typeof(InlineResponse404), description: "No se encontró el recurso que se pidió")]
         public virtual IActionResult ModificarUsuario([FromBody]UsuarioModificar body, [FromQuery][Required()]string token, [FromQuery][Required()]decimal? idUsuario)
         {
-            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();
@@ -473,7 +469,6 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult RegenerarToken([FromQuery][Required()]string token)
         {
-            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();
