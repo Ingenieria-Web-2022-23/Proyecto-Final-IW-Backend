@@ -27,4 +27,4 @@ docker run -p 5000:5000 io.swagger
 ## Documentation
 
 ```
-[Link documentation](https://app.swaggerhub.com/apis-docs/lac56-alu/TPVV/1.0.0#/).
+[Link documentation](https://app.swaggerhub.com/apis-docs/lac56-alu/TPVV/1.0.0#)
