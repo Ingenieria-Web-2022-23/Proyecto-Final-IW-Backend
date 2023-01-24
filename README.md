@@ -23,3 +23,8 @@ cd src/IO.Swagger
 docker build -t io.swagger .
 docker run -p 5000:5000 io.swagger
 ```
+
+## Documentation
+
+```
+https://app.swaggerhub.com/apis-docs/lac56-alu/TPVV/1.0.0#

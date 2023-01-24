@@ -39,7 +39,7 @@ namespace IO.Swagger.Models
         /// <value>ID del usuario que abrió el ticket</value>
 
         [DataMember(Name="usuarioEncoder")]
-        public int? UsuarioEncoder { get; set; }
+        public string? UsuarioEncoder { get; set; }
 
         /// <summary>
         /// ID Administrador que contesta el ticket
@@ -47,7 +47,11 @@ namespace IO.Swagger.Models
         /// <value>ID Administrador que contesta el ticket</value>
 
         [DataMember(Name="administradorDecoder")]
-        public int? AdministradorDecoder { get; set; }
+        public string? AdministradorDecoder { get; set; }
+
+        //metido por Luis
+        [DataMember(Name = "valoracion")]
+        public int? valoracion { get; set; }
 
         /// <summary>
         /// ID de la transacción a la que va vinculada el ticket
@@ -56,7 +60,7 @@ namespace IO.Swagger.Models
         [Required]
 
         [DataMember(Name="referenciaPago")]
-        public int? ReferenciaPago { get; set; }
+        public string? ReferenciaPago { get; set; }
 
         /// <summary>
         /// Asunto sobre el que trata la incidencia
@@ -65,7 +69,7 @@ namespace IO.Swagger.Models
         [Required]
 
         [DataMember(Name="asunto")]
-        public string Asunto { get; set; }
+        public string? Asunto { get; set; }
 
         /// <summary>
         /// Descripción y explicación de la incidencia por la que se ha abierto el ticket
@@ -87,22 +91,22 @@ namespace IO.Swagger.Models
             /// Enum ABIERTOEnum for ABIERTO
             /// </summary>
             [EnumMember(Value = "ABIERTO")]
-            ABIERTOEnum = 0,
+            ABIERTO = 0,
             /// <summary>
             /// Enum CERRADOEnum for CERRADO
             /// </summary>
             [EnumMember(Value = "CERRADO")]
-            CERRADOEnum = 1,
+            CERRADO = 1,
             /// <summary>
             /// Enum ESPERAEnum for ESPERA
             /// </summary>
             [EnumMember(Value = "ESPERA")]
-            ESPERAEnum = 2,
+            ESPERA = 2,
             /// <summary>
             /// Enum CANCELADOEnum for CANCELADO
             /// </summary>
             [EnumMember(Value = "CANCELADO")]
-            CANCELADOEnum = 3        }
+            CANCELADO = 3        }
 
         /// <summary>
         /// Estado del ticket
