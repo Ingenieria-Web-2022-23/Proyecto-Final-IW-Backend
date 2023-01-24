@@ -180,7 +180,7 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 400, type: typeof(InlineResponse400), description: "Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.")]
         public virtual IActionResult CrearUsuario([FromBody]Usuario body, [FromQuery][Required()]string token)
         {
-            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            string stringConexion = "server=localhost;port=3306;user id=root;password=adelfr.2000;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();
@@ -320,7 +320,7 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult GetListaUsuarios([FromQuery][Required()]string token)
         {
-            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            string stringConexion = "server=localhost;port=3306;user id=root;password=adelfr.2000;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();
@@ -473,7 +473,7 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 401, type: typeof(InlineResponse401), description: "Sin autorización para realizar esta operación")]
         public virtual IActionResult RegenerarToken([FromQuery][Required()]string token)
         {
-            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
+            string stringConexion = "server=localhost;port=3306;user id=root;password=adelfr.2000;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();
