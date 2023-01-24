@@ -31,6 +31,7 @@ namespace IO.Swagger
     /// </summary>
     public class Startup
     {
+        private readonly string MyCors = "MyCors";
         private readonly IWebHostEnvironment _hostingEnv;
 
         private IConfiguration Configuration { get; }
@@ -92,6 +93,13 @@ namespace IO.Swagger
                     // Use [ValidateModelState] on Actions to actually validate it in C# as well!
                     c.OperationFilter<GeneratePathParamsValidationFilter>();
                 });
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyCors, builder => 
+                {
+                    builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost").AllowAnyHeader().AllowAnyMethod();
+                });
+            });
         }
 
         /// <summary>
@@ -108,7 +116,7 @@ namespace IO.Swagger
             // app.UseStaticFiles();
 
             app.UseAuthorization();
-
+            app.UseCors(MyCors);
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
