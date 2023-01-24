@@ -38,8 +38,8 @@ namespace IO.Swagger.Models
         /// </summary>
         /// <value>Id de la devolución, si hubiera (en caso contrario -&gt; null)</value>
 
-        [DataMember(Name="devolucionId")]
-        public List<int?> DevolucionId { get; set; }
+        [DataMember(Name="usuario")]
+        public string UsuarioEmail { get; set; }
 
         /// <summary>
         /// Total de la compra
@@ -123,7 +123,7 @@ namespace IO.Swagger.Models
             var sb = new StringBuilder();
             sb.Append("class Pagos {\n");
             sb.Append("  Id: ").Append(Id).Append("\n");
-            sb.Append("  DevolucionId: ").Append(DevolucionId).Append("\n");
+            sb.Append("  UsuarioEmail: ").Append(UsuarioEmail).Append("\n");
             sb.Append("  Total: ").Append(Total).Append("\n");
             sb.Append("  Concepto: ").Append(Concepto).Append("\n");
             sb.Append("  Referencia: ").Append(Referencia).Append("\n");
@@ -172,9 +172,9 @@ namespace IO.Swagger.Models
                     Id.Equals(other.Id)
                 ) && 
                 (
-                    DevolucionId == other.DevolucionId ||
-                    DevolucionId != null &&
-                    DevolucionId.SequenceEqual(other.DevolucionId)
+                    UsuarioEmail == other.UsuarioEmail ||
+                    UsuarioEmail != null &&
+                    UsuarioEmail.Equals(other.UsuarioEmail)
                 ) && 
                 (
                     Total == other.Total ||
@@ -220,8 +220,8 @@ namespace IO.Swagger.Models
                 // Suitable nullity checks etc, of course :)
                     if (Id != null)
                     hashCode = hashCode * 59 + Id.GetHashCode();
-                    if (DevolucionId != null)
-                    hashCode = hashCode * 59 + DevolucionId.GetHashCode();
+                    if (UsuarioEmail != null)
+                    hashCode = hashCode * 59 + UsuarioEmail.GetHashCode();
                     if (Total != null)
                     hashCode = hashCode * 59 + Total.GetHashCode();
                     if (Concepto != null)

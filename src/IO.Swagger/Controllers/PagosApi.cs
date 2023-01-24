@@ -52,6 +52,39 @@ namespace IO.Swagger.Controllers
 
             return comprobarKey;
         }
+        private string devolverIDUSER(string token)
+        {
+            string id="";
+            MySqlCommand cmd2 = new MySqlCommand();
+            cmd2.Connection = conn;
+            cmd2.CommandText = "SELECT id FROM iw.usuarios where token = '" + token + "'";
+            cmd2.ExecuteNonQuery();
+            MySqlDataReader readerKey = cmd2.ExecuteReader();
+            if (readerKey.Read())
+            {
+                id = readerKey.GetString(0);
+            }
+            return id;
+        }
+        private bool isAdmin(string token)
+        {
+            bool admin = false;
+            string tipo = "";
+            MySqlCommand cmd2 = new MySqlCommand();
+            cmd2.Connection = conn;
+            cmd2.CommandText = "SELECT tipoUsuario FROM iw.usuarios where token = '" + token + "'";
+            cmd2.ExecuteNonQuery();
+            MySqlDataReader readerKey = cmd2.ExecuteReader();
+            if (readerKey.Read())
+            {
+                tipo = readerKey.GetString(0);
+                if (tipo.Equals("admin"))
+                {
+                    admin = true;
+                }
+            }
+            return admin;
+        }
         private string GetValue(EstadoEnum? paymentStatus)
         {
             EnumMemberAttribute attribute = paymentStatus
@@ -89,11 +122,27 @@ namespace IO.Swagger.Controllers
 
             if (comprobarToken(token))
             {
+                conn.Close();
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                bool isadmin = isAdmin(token);
+                conn.Close();
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                string id = devolverIDUSER(token);
+                conn.Close();
                 conn = new MySqlConnection(stringConexion);
                 conn.Open();
                 MySqlCommand cmd2 = new MySqlCommand();
                 cmd2.Connection = conn;
-                cmd2.CommandText = "SELECT * FROM iw.pagos where id = " + idPago.ToString() + "";
+                if (isadmin)
+                {
+                    cmd2.CommandText = "SELECT p.id,p.total,p.concepto,p.referencia,p.fecha,p.estado,p.detallesEstado,u.email FROM iw.pagos p,iw.usuarios u where p.fk_user=u.id and p.id = " + idPago.ToString() + "";
+                }
+                else
+                {
+                    cmd2.CommandText = "SELECT p.id,p.total,p.concepto,p.referencia,p.fecha,p.estado,p.detallesEstado,u.email FROM iw.pagos p,iw.usuarios u where p.fk_user=u.id and p.id = " + idPago.ToString() + " and p.fk_user='"+id+"'";
+                }
                 cmd2.ExecuteNonQuery();
 
                 Pagos pagoItem = new Pagos();
@@ -123,7 +172,7 @@ namespace IO.Swagger.Controllers
                         }
                     }
                     pagoItem.DetallesEstado = reader.GetString(6);
-
+                    pagoItem.UsuarioEmail = reader.GetString(7);
                     conn.Close();
                     return StatusCode(200, pagoItem);
                 }
@@ -168,11 +217,27 @@ namespace IO.Swagger.Controllers
 
             if (comprobarToken(token))
             {
+                conn.Close();
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                bool isadmin = isAdmin(token);
+                conn.Close();
+                conn = new MySqlConnection(stringConexion);
+                conn.Open();
+                string id = devolverIDUSER(token);
+                conn.Close();
                 conn = new MySqlConnection(stringConexion);
                 conn.Open();
                 MySqlCommand cmd2 = new MySqlCommand();
                 cmd2.Connection = conn;
-                cmd2.CommandText = "SELECT * FROM iw.pagos";
+                if (isadmin)
+                {
+                    cmd2.CommandText = "SELECT p.id,p.total,p.concepto,p.referencia,p.fecha,p.estado,p.detallesEstado,u.email FROM iw.pagos p,iw.usuarios u where p.fk_user=u.id";
+                }
+                else
+                {
+                    cmd2.CommandText = "SELECT p.id,p.total,p.concepto,p.referencia,p.fecha,p.estado,p.detallesEstado,u.email FROM iw.pagos p,iw.usuarios u where p.fk_user=u.id and fk_user='" + id+"'";
+                }
                 cmd2.ExecuteNonQuery();
 
                 Pagos pagoItem = new Pagos();
@@ -203,7 +268,7 @@ namespace IO.Swagger.Controllers
                         }
                     }
                     pagoItem.DetallesEstado = reader.GetString(6);
-
+                    pagoItem.UsuarioEmail = reader.GetString(7);
                     listaPagos.Add(pagoItem);
                 }
 
@@ -256,14 +321,19 @@ namespace IO.Swagger.Controllers
             {
                 try
                 {
+                    conn.Close();
+                    conn = new MySqlConnection(stringConexion);
+                    conn.Open();
+                    string id = devolverIDUSER(token);
+                    conn.Close();
                     conn = new MySqlConnection(stringConexion);
                     conn.Open();
                     MySqlCommand cmd2 = new MySqlCommand();
                     cmd2.Connection = conn;
                     string estado = GetValue(body.Estado);
-                    cmd2.CommandText = "INSERT INTO iw.pagos (total, concepto, referencia, fecha, estado, detallesEstado) VALUES ('" +
+                    cmd2.CommandText = "INSERT INTO iw.pagos (total, concepto, referencia, fecha, estado, detallesEstado,fk_user) VALUES ('" +
                         body.Total.ToString() + "', '" + body.Concepto.ToString() + "', '" + body.Referencia.ToString()
-                        + "',now()" + ", '" + estado + "','"+body.DetallesEstado.ToString()+"');";
+                        + "',now()" + ", '" + estado + "','"+body.DetallesEstado.ToString()+ "', '" +  id + "');";
                     cmd2.ExecuteNonQuery();
                     conn.Close();
                     resp.Token = token;

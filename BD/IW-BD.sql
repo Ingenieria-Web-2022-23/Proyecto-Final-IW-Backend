@@ -166,8 +166,11 @@ CREATE TABLE `pagos` (
   `referencia` varchar(255) DEFAULT NULL,
   `fecha` datetime DEFAULT CURRENT_TIMESTAMP,
   `estado` varchar(255) NOT NULL,
+  `fk_user` int NOT NULL,
   `detallesEstado` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_user_idx` (`fk_user`),
+  CONSTRAINT `fk_user` FOREIGN KEY (`fk_user`) REFERENCES `usuarios` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
