@@ -93,7 +93,7 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 403, type: typeof(InlineResponse403), description: "El cliente no posee los permisos necesarios para cierto contenido, por lo que el servidor está rechazando otorgar una respuesta apropiada.")]
         public virtual IActionResult Login([FromBody] Usuario body)
         {
-            string stringConexion = "server=localhost;port=3306;user id=root;password=adelfr.2000;database=iw;SslMode=none";
+            string stringConexion = "server=localhost;port=3306;user id=luis;password=root;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();

@@ -271,7 +271,7 @@ namespace IO.Swagger.Controllers
                     listaPagos.Add(pagoItem);
                 }
 
-                if (listaPagos.Count > 0)
+                if (listaPagos.Count >= 0)
                 {
                     conn.Close();
                     return StatusCode(200, listaPagos);

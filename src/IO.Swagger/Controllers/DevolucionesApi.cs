@@ -207,7 +207,7 @@ namespace IO.Swagger.Controllers
                     listaDevoluciones.Add(devolucionItem);
                 }
 
-                if (listaDevoluciones.Count > 0)
+                if (listaDevoluciones.Count >= 0)
                 {
                     conn.Close();
                     return StatusCode(200, listaDevoluciones);

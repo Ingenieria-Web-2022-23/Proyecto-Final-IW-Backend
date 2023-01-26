@@ -559,7 +559,7 @@ namespace IO.Swagger.Controllers
         /// <response code="200">Detalles o datos del ticket</response>
         /// <response code="400">Esta respuesta significa que el servidor no pudo interpretar la solicitud dada una sintaxis inválida.</response>
         /// <response code="401">Sin autorización para realizar esta operación</response>
-        [HttpPost]
+        [HttpPut]
         [Route("/lac56-alu/TPVV/1.0.0/tpvv/valorarTicket")]
         [ValidateModelState]
         [SwaggerOperation("ValorarTicket")]
