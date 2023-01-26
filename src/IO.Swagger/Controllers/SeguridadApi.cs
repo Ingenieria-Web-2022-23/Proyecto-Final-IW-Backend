@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
+using System;
 
 namespace IO.Swagger.Controllers
 {
@@ -93,7 +94,6 @@ namespace IO.Swagger.Controllers
         [SwaggerResponse(statusCode: 403, type: typeof(InlineResponse403), description: "El cliente no posee los permisos necesarios para cierto contenido, por lo que el servidor está rechazando otorgar una respuesta apropiada.")]
         public virtual IActionResult Login([FromBody] Usuario body)
         {
-            string stringConexion = "server=localhost;port=3306;user id=root;password=adelfr.2000;database=iw;SslMode=none";
             conn = new MySqlConnection(stringConexion);
             conn.Open();
             MySqlCommand cmd = new MySqlCommand();
@@ -101,6 +101,7 @@ namespace IO.Swagger.Controllers
             InlineResponse201 resp = new InlineResponse201();
             cmd.CommandText = "SELECT * FROM iw.usuarios where email = '" + body.Email + "' and password='" + body.Password + "'";
             MySqlDataReader reader = cmd.ExecuteReader();
+            Usuario usuarioItem = new Usuario();
             if (reader.Read() == false)
             {
                 InlineResponse403 resp3 = new InlineResponse403();
@@ -110,6 +111,13 @@ namespace IO.Swagger.Controllers
             }
             else
             {
+                usuarioItem.Id = Convert.ToInt32(reader.GetString(0));
+                usuarioItem.Nombre = reader.GetString(1);
+                usuarioItem.Email = reader.GetString(2);
+                usuarioItem.Password = reader.GetString(3);
+                usuarioItem.Token = reader.GetString(4);
+                usuarioItem.NombreEmpresa = reader.GetString(5);
+                usuarioItem.TipoUsuario = reader.GetString(6);
                 conn.Close();
                 conn.Open();
                 MySqlCommand cmd2 = new MySqlCommand();
@@ -125,11 +133,10 @@ namespace IO.Swagger.Controllers
                 }
                 else
                 {
-                    resp.Token = reader1.GetString(1);
                     conn.Close();
                 }
             }
-            return StatusCode(201, resp);
+            return StatusCode(201, usuarioItem);
         }
     }
 }
